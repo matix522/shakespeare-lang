@@ -96,7 +96,7 @@ case class Not(c: Condition) extends Condition
 
 case class ConditionalBlock(condition: Condition, expression: Expression) extends Expression
 
-class Scene(val id: String, val sceneParts: List[ScenePart]) {
+class Scene(val id: Int, val sceneParts: List[ScenePart]) {
 
     override def toString = s"\t\nScene(\n\t\tid=$id,\n\t\tsceneParts=$sceneParts\n\t)"
 }

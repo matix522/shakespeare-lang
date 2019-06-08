@@ -26,9 +26,9 @@ class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
         for (scenePart <- scene.sceneParts) {
             scenePart match {
                 case Enter(first, None) => stage.enter(characters(first))
-                case Enter(first, second) => stage.enter(characters(first), characters(second))
+                case Enter(first, second) => stage.enter(characters(first), characters(second.get))
                 case Exeunt(None, None) => stage.exeunt()
-                case Exeunt(first, second) => stage.exeunt(characters(first), characters(second))
+                case Exeunt(first, second) => stage.exeunt(characters(first.get), characters(second.get))
                 case Exit(first) => stage.exit(characters(first))
                 case Speaker(first) => stage.changeSpeaker(characters(first))
                 case Sentence(expressions) =>
