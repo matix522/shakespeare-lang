@@ -2,15 +2,15 @@
 class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
     var stage = new Stage
 
-    def execute() = {
+    def execute(): Unit = {
         var actNumber = 0
 
 
         while (actNumber < acts.length) {
-            var sceneNumber = 0;
+            var sceneNumber = 0
             val act = acts(actNumber)
             while (sceneNumber < act.scenes.length) {
-                var scene = act.scenes(sceneNumber)
+                val scene = act.scenes(sceneNumber)
                 for (scenePart <- scene.sceneParts) {
                     scenePart match {
                         case Enter(first, None) => stage.enter(characters(first))
@@ -24,18 +24,18 @@ class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
                 }
                 sceneNumber += 1
             }
-            actNumber += 1;
+            actNumber += 1
         }
     }
 
-    def getCharacter(character: String) = {
+    def getCharacter(character: String): Character = {
         if (stage.isOnStage(characters(character))) {
             characters(character)
         }
         else throw new RuntimeException(s"There is no $character on the scene.")
     }
 
-    def doExpressions(expressions: List[Expression]) = {
+    def doExpressions(expressions: List[Expression]): Unit = {
         for (expr <- expressions) {
             expr match {
 

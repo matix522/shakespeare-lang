@@ -1,8 +1,8 @@
 import scala.collection.mutable.ListBuffer
 
-class Parser(val sourceCode: String) {
+class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
-    def parse() = {
+    def parse(): Unit = {
         var actsCode = sourceCode.split("Act ").toList
         if (actsCode.length < 2) {
             throw new IllegalArgumentException("No acts in source code")
