@@ -43,8 +43,8 @@ case class LoadInt(character: String) extends Expression
 case class PrintChar(character: String) extends Expression
 case class LoadChar(character: String) extends Expression
 
-case class GotoS(scene: Scene) extends Expression //TODO LOW PRIO
-case class GotoA(scene: Act) extends Expression //TODO LOW PRIO
+case class GotoS(scene: Int) extends Expression //TODO LOW PRIO
+case class GotoA(act: Int) extends Expression //TODO LOW PRIO
 
 case class Push(destCharacter: String, src: Value) extends Expression  //TODO LOW PRIO
 case class Pop(destCharacter: String) extends Expression  //TODO LOW PRIO

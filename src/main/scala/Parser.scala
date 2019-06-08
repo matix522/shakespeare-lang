@@ -33,7 +33,7 @@ class Parser(val sourceCode: String) {
         return new Act(id, scenes)
     }
 
-    def parseScene(sceneCode: String): Scene = {
+    def parseScene(sceneCode: String): (Int, Scene) = {
         val id = sceneCode.split(":")(0).trim() //TODO Check if roman numeral
 
         val sceneParts = new ListBuffer[ScenePart]
@@ -57,7 +57,7 @@ class Parser(val sourceCode: String) {
             sceneParts.addOne(enterExitBlock)
         }
 
-        new Scene(id, sceneParts.toList)
+        (id, new Scene(id, sceneParts.toList))
     }
 
     def isRomanNumeral(roman: String) = {
