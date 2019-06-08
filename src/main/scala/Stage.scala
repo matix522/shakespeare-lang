@@ -17,18 +17,18 @@ class Stage {
 
     def exit(character: Character): Unit = {
         speaker match {
-            case Some(`character`) => {
+            case Some(`character`) =>
                 speaker = None
                 return
-            }
+            case _ =>
         }
         listener match {
-            case Some(`character`) => {
+            case Some(`character`) =>
                 listener = None
                 return
-            }
+            case _ => throw new RuntimeException(s"There is no $character on the scene.")
         }
-        throw new RuntimeException(s"There is no $character on the scene.")
+
     }
 
     def exeunt(): Unit = {
@@ -53,10 +53,17 @@ class Stage {
 
     def changeSpeaker(character: Character): Unit = {
         listener match {
-            case Some(`character`) => listener = speaker
-            case _ => throw new RuntimeException(s"$character is not listener on scene.")
+            case Some(`character`) =>
+                listener = speaker
+                speaker = Some(character)
+                return
+            case _ =>
         }
-        speaker = Some(character)
+        speaker match {
+            case Some(`character`) => return
+            case _ =>
+        }
+        throw new RuntimeException(s"$character is not on scene.")
     }
 
     def isOnStage(character: Character): Boolean = {

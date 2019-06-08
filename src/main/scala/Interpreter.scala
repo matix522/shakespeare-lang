@@ -1,14 +1,14 @@
 
-class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
+class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act]) {
     var stage = new Stage
     var sceneNumber = 1
     var actNumber = 1
 
     def execute(): Unit = {
-        while (actNumber < acts.toList.length) {
+        while (actNumber <= acts.toList.length) {
             val act = acts(actNumber)
             sceneNumber = 1
-            while (sceneNumber > 0 && sceneNumber < act.scenes.toList.length) {
+            while (sceneNumber > 0 && sceneNumber <= act.scenes.toList.length) {
                 sceneNumber = doScene(act.scenes(sceneNumber))
             }
             actNumber += 1
