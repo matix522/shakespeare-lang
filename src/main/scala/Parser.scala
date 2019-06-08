@@ -68,7 +68,12 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
     def parse_statements(s: String): List[ScenePart] = {
-        var sentences = s.split("[A-Z,a-z]*:").filter(s => s.length > 0).toList
+        var sentences = s.split("[A-Z,a-z]*:").filter(s => s.length > 0)
+          .map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim)
+            .toList
+
+// TODO names should be lowwercase
+      // also add lowercaseing in dictionary
         var characters = "[A-Z,a-z]*:".r
             .findAllMatchIn(s)
             .map(m => m.group(0).replace(":", ""))
@@ -94,9 +99,12 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         var ret = new ListBuffer[Expression]
 
-        val sentences = str.split("\\.|!|\\?").toList
+     // println(str)
+
+        val sentences = str.split("\\.|!|\\?").map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim).toList
         for (s <- sentences) {
-            val printInt = "(Open) (.*) (heart)".r.findFirstMatchIn(s)
+         // println(s)
+            val printInt = "(open) (.*) (heart)".r.findFirstMatchIn(s)
             if (printInt.nonEmpty) {
 
                 val possessive =  printInt.get.group(2).toLowerCase
@@ -107,7 +115,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                     ret.addOne(PrintInt(false))
                 else throw new IllegalArgumentException(s"Error, $possessive is not a correct possesive word ")
             }
-            val printChar = "(Speak) (.*) (.)".r.findFirstMatchIn(s)
+            val printChar = "(speak) (.*) (.)".r.findFirstMatchIn(s)
             if (printChar.nonEmpty) {
 
                 val possessive = printChar.get.group(2).toLowerCase
@@ -118,6 +126,20 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                     ret.addOne(PrintChar(false))
                 else throw new IllegalArgumentException(s"Error, $possessive is not a correct possessive word ")
             }
+
+          //TODO
+
+          // case assignment
+          // you/../.. => asignment to listener
+          //i ... => to speaker
+
+          //pomijac ewentualne are as * as
+
+
+
+          //napisac funkcje, ktora ogarnie wartosci wyrazen
+
+
         }
 
         Sentence(ret.toList)
