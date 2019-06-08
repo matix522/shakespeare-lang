@@ -32,118 +32,118 @@ class Dictionary ()
 
   for (line <- Source.fromFile(file).getLines){
 
-    article.add(line.replace("\n",""))
+    article.add(line.replace("\n","").toLowerCase().trim)
   }
 
 
   file = directory + "be" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    be.add(line.replace("\n",""))
+    be.add(line.replace("\n","").toLowerCase().trim)
   }
 
 
   file = directory + "character" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    character.add(line.replace("\n",""))
+    character.add(line.replace("\n","").toLowerCase().trim)
   }
 
 
   file = directory + "first_person" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    first_person.add(line.replace("\n",""))
+    first_person.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "first_person_possessive" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    first_person_possessive.add(line.replace("\n",""))
+    first_person_possessive.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "first_person_reflexive" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    first_person_reflexive.add(line.replace("\n",""))
+    first_person_reflexive.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "negative_adjective" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    negative_adjective.add(line.replace("\n",""))
+    negative_adjective.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "negative_comparative" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    negative_comparative.add(line.replace("\n",""))
+    negative_comparative.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "negative_noun" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    negative_noun.add(line.replace("\n",""))
+    negative_noun.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "neutral_adjective" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    neutral_adjective.add(line.replace("\n",""))
+    neutral_adjective.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "neutral_noun" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    neutral_noun.add(line.replace("\n",""))
+    neutral_noun.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "nothing" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    nothing.add(line.replace("\n",""))
+    nothing.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "positive_adjective" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    positive_adjective.add(line.replace("\n",""))
+    positive_adjective.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "positive_comparative" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    positive_comparative.add(line.replace("\n",""))
+    positive_comparative.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "positive_noun" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    positive_noun.add(line.replace("\n",""))
+    positive_noun.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "second_person" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    second_person.add(line.replace("\n",""))
+    second_person.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "second_person_possessive" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    second_person_possessive.add(line.replace("\n",""))
+    second_person_possessive.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "second_person_reflexive" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    second_person_reflexive.add(line.replace("\n",""))
+    second_person_reflexive.add(line.replace("\n","").toLowerCase().trim)
   }
 
   file = directory + "third_person_possessive" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    third_person_possessive.add(line.replace("\n",""))
+    third_person_possessive.add(line.replace("\n","").toLowerCase().trim)
   }
 
 
