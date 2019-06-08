@@ -21,7 +21,21 @@ class Parser(val sourceCode: String) {
     }
 
     def parseAct(actCode: String): Act = {
-        val id = actCode.split(":")(0).trim() //TODO Check if roman numeral
+        val id = actCode.split(":")(0).trim()
+
+        //TODO Check if roman numeral
+
+            val act_number = RomanToInt(id)
+
+            if (act_number == -1){
+
+                // error?
+            }
+
+
+        //TODO end
+
+
         var scenesCode = actCode.split("Scene ").toList
 
         if (scenesCode.length < 2) {
@@ -34,7 +48,20 @@ class Parser(val sourceCode: String) {
     }
 
     def parseScene(sceneCode: String): Scene = {
-        val id = sceneCode.split(":")(0).trim() //TODO Check if roman numeral
+        val id = sceneCode.split(":")(0).trim()
+
+        //TODO Check if roman numeral
+
+        val scene_number = RomanToInt(id)
+
+        if (scene_number == -1){
+
+            // error?
+        }
+
+
+        //TODO end
+
 
         val sceneParts = new ListBuffer[ScenePart]
 
