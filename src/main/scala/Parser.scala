@@ -85,9 +85,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
     def parse_sentences(str: String): Sentence = {
-/*
-        var ret = new ListBuffer[Expression]
 
+        var ret = new ListBuffer[Expression]
+/*
         val sentences = str.split(". ")
 
         for (s <- sentences) {
@@ -114,9 +114,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             // else  if (s.matches())
 
 
-        }
+        }*/
 
-        Sentence(ret.toList)*/
+        Sentence(ret.toList)
     }
 
 
