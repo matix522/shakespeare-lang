@@ -4,7 +4,7 @@ import scala.io.Source
 class Dictionary ()
 {
 
-  val directory : String = "./words/"
+  val directory : String = "./src/main/scala/words/"
   val file_extension = ".wordlist"
 
   var  article: mutable.Set[String] = mutable.Set[String]()
