@@ -35,15 +35,17 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     def parseScene(sceneCode: String): (Int, Scene) = {
         val id = RomanToInt(sceneCode.split(":")(0).trim())
+        val sentences = sceneCode.split(".")
+        val code = sentences.slice(1,sentences.length).mkString(".")
 
         val sceneParts = new ListBuffer[ScenePart]
 
         val enter = "\\[((Enter)|(Exit)|(Exeunt))( [A-Z][a-z]*)?( and )?([A-Z][a-z]*)?\\]"
         val enterRegex = enter.r
 
-        val dialogs = sceneCode.split(enter).toList.map(s => s.trim())
+        val dialogs = code.split(enter).toList.map(s => s.trim())
         var i = 0
-        for (regMatch <- enterRegex.findAllMatchIn(sceneCode)) {
+        for (regMatch <- enterRegex.findAllMatchIn(code)) {
             val enterExitBlock = regMatch match {
                 case enterRegex("Exeunt", _, _, _, first, " and ", second) => Exeunt(Some(first.trim), Some(second.trim))
                 case enterRegex("Exeunt", _, _, _, _, _, _) => Exeunt(None, None)
@@ -55,6 +57,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
             // TODO somehow add speaker
             //sceneParts.addOne(Sentence(List(TODOExpression(dialogs(i)))))
+
 
             sceneParts.addAll(parse_statements(dialogs(i)))
 
@@ -70,7 +73,6 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         var characters = s.split("\n[A-Z,a-z]*:\n")
 
         var ret = new ListBuffer[ScenePart]
-
         for (c <- characters) {
             var character_sentences = c.split(":")
 
@@ -131,10 +133,8 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
 
     def RomanToInt(roman: String): Int = {
-
         if (!roman.matches("^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$")) {
-            //incorrect roman number
-            return -1
+           throw new IllegalArgumentException( s"$roman is not roman numeral")
         }
 
 
