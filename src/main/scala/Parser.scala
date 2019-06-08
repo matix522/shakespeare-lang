@@ -68,7 +68,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
     def parse_statements(s: String): List[ScenePart] = {
-        var sentences = s.split("[A-Z,a-z]*:").filter(s => s.length > 0).toList
+        var sentences = s.split("[A-Z,a-z]*:").filter(s => s.length > 0)
+          .map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim)
+            .toList
         var characters = "[A-Z,a-z]*:".r
             .findAllMatchIn(s)
             .map(m => m.group(0).replace(":", ""))
