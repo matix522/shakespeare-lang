@@ -71,6 +71,8 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         var sentences = s.split("[A-Z,a-z]*:").filter(s => s.length > 0)
           .map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim)
             .toList
+
+
         var characters = "[A-Z,a-z]*:".r
             .findAllMatchIn(s)
             .map(m => m.group(0).replace(":", ""))
@@ -96,8 +98,11 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         var ret = new ListBuffer[Expression]
 
-        val sentences = str.split("\\.|!|\\?").toList
+      println(str)
+
+        val sentences = str.split("\\.|!|\\?").map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim).toList
         for (s <- sentences) {
+          println(s)
             val printInt = "(open) (.*) (heart)".r.findFirstMatchIn(s)
             if (printInt.nonEmpty) {
 

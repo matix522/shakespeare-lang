@@ -46,7 +46,7 @@ class Dictionary ()
   file = directory + "character" + file_extension
   for (line <- Source.fromFile(file).getLines){
 
-    character.add(line.replace("\n","").toLowerCase().trim)
+    character.add(line.replace("\n",""))
   }
 
 
