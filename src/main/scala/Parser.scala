@@ -126,6 +126,28 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     def parse_sentences(str: String) : Sentence =
     {
 
+        var ret = new ListBuffer[Expression]
+
+        val sentences = str.split(". ")
+
+        // regexes
+
+        val output_int = "Open .*".r
+        val output_char = "Speak .*".r
+
+
+
+
+
+
+        for (s <- sentences){
+
+           if (s.matches("Open .*")){
+
+               //ret.addOne()
+
+           }
+           //else  if
 
 
 
@@ -133,7 +155,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
 
 
+        }
 
+        Sentence(ret.toList)
     }
 
 
