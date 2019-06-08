@@ -18,12 +18,14 @@ class Stage {
     def exit(character: Character): Unit = {
         speaker match {
             case Some(`character`) => {
-                speaker = None; return
+                speaker = None;
+                return
             }
         }
         listener match {
             case Some(`character`) => {
-                listener = None; return
+                listener = None;
+                return
             }
         }
         throw new RuntimeException(s"There is no $character on the scene.")
@@ -36,34 +38,35 @@ class Stage {
 
     def exeunt(character1: Character, character2: Character): Unit = {
         speaker match {
-            case Some(`character1`) => {
-                speaker = None
-            }
-            case Some(`character2`) => {
-                speaker = None
-            }
+            case Some(`character1`) => speaker = None
+            case Some(`character2`) => speaker = None
+
             case _ => throw new RuntimeException(s"There are no $character1 or $character2 on the scene.")
 
         }
         listener match {
-            case Some(`character1`) => {
-                listener = None
-            }
-            case Some(`character2`) => {
-                listener = None
-            }
+            case Some(`character1`) => listener = None
+            case Some(`character2`) => listener = None
             case _ => throw new RuntimeException(s"There are no $character1 or $character2 on the scene.")
         }
     }
 
     def changeSpeaker(character: Character) = {
         listener match {
-            case Some(`character`) => {
-                listener = speaker
-            }
+            case Some(`character`) => listener = speaker
             case _ => throw new RuntimeException(s"$character is not listener on scene.")
         }
         speaker = Some(character)
+    }
+
+    def isOnStage(character: Character): Boolean = {
+        listener match {
+            case Some(`character`) => return true
+        }
+        speaker match {
+            case Some(`character`) => return true
+        }
+        false
     }
 
 
