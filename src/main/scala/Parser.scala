@@ -13,7 +13,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         //println(actsCode)
         val acts = actsCode.slice(1, actsCode.size).map(parseAct).toMap
 
-        println(acts)
+        //println(acts)
     }
 
     def parseCharacters(charactersList: String): List[Character] = {
@@ -64,7 +64,6 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             i += 1
             sceneParts.addOne(enterExitBlock)
         }
-
         (id, new Scene(id, sceneParts.toList))
     }
 
@@ -82,13 +81,12 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             .toList
 
         var ret = new ListBuffer[ScenePart]
-        for ((c, s) <- characters.map(s => Speaker(s)).zip(sentences.map(s => parse_sentences(s)))) {
+        for ((c, s) <- characters.map(s => Speaker(s)).zip(sentences.map(s => parse_sentences(s.replace("\r\n", " "))))) {
             ret.addOne(c)
             ret.addOne(s)
         }
-        println(characters)
-        print(s)
-
+        //        println(characters)
+        //        print(s)
         ret.toList
     }
 
@@ -96,49 +94,30 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         var ret = new ListBuffer[Expression]
 
-        val sentences = str.split("\\.|!|\\?")
-
+        val sentences = str.split("\\.|!|\\?").toList
         for (s <- sentences) {
+            val printInt = "(Open) (.*) (heart)".r.findFirstMatchIn(s)
+            if (printInt.nonEmpty) {
 
-            if (s.matches("Open .*")) {
+                val possessive =  printInt.get.group(2).toLowerCase
 
-                var tokens = s.split(" ")
-
-                val possesive = tokens(1)
-
-                if (dictionary.first_person_possessive.contains(possesive)) {
+                if (dictionary.first_person_possessive.contains(possessive))
                     ret.addOne(PrintInt(true))
-
-
-                }
-                else if (dictionary.second_person_possessive.contains(possesive)) {
+                else if (dictionary.second_person_possessive.contains(possessive))
                     ret.addOne(PrintInt(false))
-
-
-                }
-
-                else throw new IllegalArgumentException(s"Error, $possesive is not a correct possesive word ")
+                else throw new IllegalArgumentException(s"Error, $possessive is not a correct possesive word ")
             }
-            else if (s.matches("Speak .*")) {
+            val printChar = "(Speak) (.*) (.)".r.findFirstMatchIn(s)
+            if (printChar.nonEmpty) {
 
-                var tokens = s.split(" ")
+                val possessive = printChar.get.group(2).toLowerCase
 
-                val possesive = tokens(1)
-
-                if (dictionary.first_person_possessive.contains(possesive)) {
+                if (dictionary.first_person_possessive.contains(possessive))
                     ret.addOne(PrintChar(true))
-
-
-                }
-                else if (dictionary.second_person_possessive.contains(possesive)) {
+                else if (dictionary.second_person_possessive.contains(possessive))
                     ret.addOne(PrintChar(false))
-
-                }
-
-                else throw new IllegalArgumentException(s"Error, $possesive is not a correct possesive word ")
+                else throw new IllegalArgumentException(s"Error, $possessive is not a correct possessive word ")
             }
-
-
         }
 
         Sentence(ret.toList)
