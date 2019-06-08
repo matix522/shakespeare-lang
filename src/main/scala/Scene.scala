@@ -16,9 +16,49 @@ sealed abstract class Expression
 sealed abstract class Value extends Expression
 sealed abstract class Condition extends Expression
 
+
+
 case class TODOExpression(todo: String) extends Expression { //TODO EXPRESSIONS
     override def toString = s"Some expressions"
+
+//
+//    def parse_expressions(): List[Expression] =
+//    {
+//
+//        if (todo.isEmpty) {
+//            return List[Expression]()
+//        }
+//
+//        val speaker_sentences= todo.split(":")
+//
+//        var speaker: String = speaker_sentences(0)
+//
+//        var sentences = speaker_sentences(1)
+//
+//       // List(Speaker(speaker)) ::
+//
+//        handle_sentences(sentences)
+//
+//
+//
+//
+//    }
+//
+//
+//    def handle_sentences(s : String) : List[Expression] =
+//    {
+//        if (s.isEmpty) {
+//            return List[Expression]()
+//        }
+//
+//        return List[Expression]()
+//
+//
+//    }
+//
+
 }
+
 
 case class PositiveNoun(character: String) extends Value
 case class NegativeNoun(character: String) extends Value

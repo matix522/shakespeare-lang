@@ -79,13 +79,68 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 case enterRegex("Exit", _, _, _, first, _, _) => Exit(first)
                 case _ => throw new IllegalArgumentException(s"Incorect [Enter/Exit] block $regMatch")
             }
-            sceneParts.addOne(Sentence(List(TODOExpression(dialogs(i)))))
+
+            // TODO somehow add speaker
+            //sceneParts.addOne(Sentence(List(TODOExpression(dialogs(i)))))
+
+            sceneParts.addAll(parse_statements(dialogs(i)))
+
             i += 1
             sceneParts.addOne(enterExitBlock)
         }
 
         new Scene(id, sceneParts.toList)
     }
+
+    def parse_statements(s : String) : List[ScenePart] =
+    {
+
+        var characters  = s.split("\n[A-Z,a-z]*:\n")
+
+        var ret = new ListBuffer[ScenePart]
+
+        for (c <- characters)
+            {
+                var character_sentences = c.split(":")
+
+                var character = character_sentences(0).trim()
+
+                var sentences = character_sentences(1)
+
+                if (!dictionary.character.contains(character)){
+
+                    throw new IllegalArgumentException(s"ERROR! Character $character is not an Shakespeare character!")
+                }
+
+                ret+= Speaker(character)
+
+                ret += parse_sentences(sentences)
+
+            }
+
+
+        ret.toList
+
+    }
+
+    def parse_sentences(str: String) : Sentence =
+    {
+
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
 
     def RomanToInt(roman: String) : Int = {
 
