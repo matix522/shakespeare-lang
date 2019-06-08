@@ -11,7 +11,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         println("Characters:" + charactersList)
 
         //println(actsCode)
-        val acts = actsCode.slice(1, actsCode.size).map(parseAct)
+        val acts = actsCode.slice(1, actsCode.size).map(parseAct).toMap
 
         println(acts)
     }
@@ -20,57 +20,32 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         charactersList.trim.split("\n").toList.map(s => new Character(s.split(",")(0), 0))
     }
 
-    def parseAct(actCode: String): Act = {
-        val id = actCode.split(":")(0).trim()
-
-        //TODO Check if roman numeral
-
-            val act_number = RomanToInt(id)
-
-            if (act_number == -1){
-
-                // error?
-            }
-
-
-        //TODO end
-
+    def parseAct(actCode: String): (Int, Act) = {
+        val id = RomanToInt(actCode.split(":")(0).trim())
 
         var scenesCode = actCode.split("Scene ").toList
 
         if (scenesCode.length < 2) {
             throw new IllegalArgumentException(s"No scenes in act $id ")
         }
-        val scenes = scenesCode.slice(1, scenesCode.size).map(parseScene)
+        val scenes = scenesCode.slice(1, scenesCode.size).map(parseScene).toMap
 
-
-        new Act(id, scenes)
+        (id, new Act(id, scenes))
     }
 
-    def parseScene(sceneCode: String): Scene = {
-        val id = sceneCode.split(":")(0).trim()
-
-        //TODO Check if roman numeral
-
-        val scene_number = RomanToInt(id)
-
-        if (scene_number == -1){
-
-            // error?
-        }
-
-
-        //TODO end
-
+    def parseScene(sceneCode: String): (Int, Scene) = {
+        val id = RomanToInt(sceneCode.split(":")(0).trim())
+        val sentences = sceneCode.split("\\.")
+        val code = sentences.slice(1, sentences.length).mkString(".")
 
         val sceneParts = new ListBuffer[ScenePart]
 
         val enter = "\\[((Enter)|(Exit)|(Exeunt))( [A-Z][a-z]*)?( and )?([A-Z][a-z]*)?\\]"
         val enterRegex = enter.r
 
-        val dialogs = sceneCode.split(enter).toList.map(s => s.trim())
+        val dialogs = code.split(enter).toList.map(s => s.trim())
         var i = 0
-        for (regMatch <- enterRegex.findAllMatchIn(sceneCode)) {
+        for (regMatch <- enterRegex.findAllMatchIn(code)) {
             val enterExitBlock = regMatch match {
                 case enterRegex("Exeunt", _, _, _, first, " and ", second) => Exeunt(Some(first.trim), Some(second.trim))
                 case enterRegex("Exeunt", _, _, _, _, _, _) => Exeunt(None, None)
@@ -83,82 +58,85 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             // TODO somehow add speaker
             //sceneParts.addOne(Sentence(List(TODOExpression(dialogs(i)))))
 
+
             sceneParts.addAll(parse_statements(dialogs(i)))
 
             i += 1
             sceneParts.addOne(enterExitBlock)
         }
 
-        new Scene(id, sceneParts.toList)
+        (id, new Scene(id, sceneParts.toList))
     }
 
-    def parse_statements(s : String) : List[ScenePart] =
-    {
-
-        var characters  = s.split("\n[A-Z,a-z]*:\n")
+    def parse_statements(s: String): List[ScenePart] = {
+        var sentences = s.split("[A-Z,a-z]*:").filter(s => s.length > 0).toList
+        var characters = "[A-Z,a-z]*:".r
+            .findAllMatchIn(s)
+            .map(m => m.group(0).replace(":", ""))
+            .map(s => {
+                if (!dictionary.character.contains(s)) {
+                    throw new IllegalArgumentException(s"ERROR! Character $s is not an Shakespeare character!")
+                };
+                s
+            })
+            .toList
 
         var ret = new ListBuffer[ScenePart]
-
-        for (c <- characters)
-            {
-                var character_sentences = c.split(":")
-
-                var character = character_sentences(0).trim()
-
-                var sentences = character_sentences(1)
-
-                if (!dictionary.character.contains(character)){
-
-                    throw new IllegalArgumentException(s"ERROR! Character $character is not an Shakespeare character!")
-                }
-
-                ret+= Speaker(character)
-
-                ret += parse_sentences(sentences, character)
-
-            }
-
+        for ((c, s) <- characters.map(s => Speaker(s)).zip(sentences.map(s => parse_sentences(s)))) {
+            ret.addOne(c)
+            ret.addOne(s)
+        }
+        println(characters)
+        print(s)
 
         ret.toList
-
     }
 
-    def parse_sentences(str: String, character: String) : Sentence =
-    {
+    def parse_sentences(str: String): Sentence = {
 
         var ret = new ListBuffer[Expression]
 
-        val sentences = str.split(". ")
+        val sentences = str.split("\\.|!|\\?")
 
-        for (s <- sentences){
+        for (s <- sentences) {
 
-           if (s.matches("Open .*")){
+            if (s.matches("Open .*")) {
 
-               var tokens = s.split(" ")
+                var tokens = s.split(" ")
 
-               val possesive = tokens(1)
+                val possesive = tokens(1)
 
-               if (dictionary.first_person_possessive.contains(possesive))
-                   {
-                       ret.addOne(PrintInt(character))
-
-
-                   }
-               else if (dictionary.second_person_possessive.contains((possesive)))
-                   {
-                       ret.addOne(PrintInt(character))
+                if (dictionary.first_person_possessive.contains(possesive)) {
+                    ret.addOne(PrintInt(true))
 
 
-                   }
-
-               else throw  new IllegalArgumentException(s"Error, $possesive is not a correct possesive word ")
-           }
-          // else  if (s.matches())
+                }
+                else if (dictionary.second_person_possessive.contains(possesive)) {
+                    ret.addOne(PrintInt(false))
 
 
+                }
+
+                else throw new IllegalArgumentException(s"Error, $possesive is not a correct possesive word ")
+            }
+            else if (s.matches("Speak .*")) {
+
+                var tokens = s.split(" ")
+
+                val possesive = tokens(1)
+
+                if (dictionary.first_person_possessive.contains(possesive)) {
+                    ret.addOne(PrintChar(true))
 
 
+                }
+                else if (dictionary.second_person_possessive.contains(possesive)) {
+                    ret.addOne(PrintChar(false))
 
+                }
+
+                else throw new IllegalArgumentException(s"Error, $possesive is not a correct possesive word ")
+            }
 
 
         }
@@ -167,26 +145,19 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
 
+    def RomanToInt(roman: String): Int = {
+        if (!roman.matches("^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$")) {
+            throw new IllegalArgumentException(s"$roman is not roman numeral")
+        }
 
 
-
-
-
-    def RomanToInt(roman: String) : Int = {
-
-        if ( !roman.matches("^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$")) {
-                //incorrect roman number
-                return -1
-            }
-
-
-        val roman_numerals_map : Map[Char,Int] = Map('M' -> 1000, 'D' -> 500,
+        val roman_numerals_map: Map[Char, Int] = Map('M' -> 1000, 'D' -> 500,
             'C' -> 100, 'L' -> 50, 'X' -> 10, 'V' -> 5, 'I' -> 1)
 
         var res: Int = 0
 
         var i = 0
-        while ( i < roman.length) {
+        while (i < roman.length) {
 
             val s1 = roman_numerals_map(roman.charAt(i))
 

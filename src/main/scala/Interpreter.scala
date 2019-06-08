@@ -1,28 +1,15 @@
 
 class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
     var stage = new Stage
+    var sceneNumber = 1
+    var actNumber = 1
 
     def execute(): Unit = {
-        var actNumber = 0
-
-
-        while (actNumber < acts.length) {
-            var sceneNumber = 0
+        while (actNumber < acts.toList.length) {
             val act = acts(actNumber)
-            while (sceneNumber < act.scenes.length) {
-                val scene = act.scenes(sceneNumber)
-                for (scenePart <- scene.sceneParts) {
-                    scenePart match {
-                        case Enter(first, None) => stage.enter(characters(first))
-                        case Enter(first, second) => stage.enter(characters(first), characters(second.get))
-                        case Exeunt(None, None) => stage.exeunt()
-                        case Exeunt(first, second) => stage.exeunt(characters(first.get), characters(second.get))
-                        case Exit(first) => stage.exit(characters(first))
-                        case Speaker(first) => stage.changeSpeaker(characters(first))
-                        case Sentence(expressions) => doExpressions(expressions)
-                    }
-                }
-                sceneNumber += 1
+            sceneNumber = 1
+            while (sceneNumber > 0 && sceneNumber < act.scenes.toList.length) {
+                sceneNumber = doScene(act.scenes(sceneNumber))
             }
             actNumber += 1
         }
@@ -35,27 +22,61 @@ class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
         else throw new RuntimeException(s"There is no $character on the scene.")
     }
 
-    def doExpressions(expressions: List[Expression]): Unit = {
+    def doScene(scene: Scene): Int = {
+        for (scenePart <- scene.sceneParts) {
+            scenePart match {
+                case Enter(first, None) => stage.enter(characters(first))
+                case Enter(first, second) => stage.enter(characters(first), characters(second.get))
+                case Exeunt(None, None) => stage.exeunt()
+                case Exeunt(first, second) => stage.exeunt(characters(first.get), characters(second.get))
+                case Exit(first) => stage.exit(characters(first))
+                case Speaker(first) => stage.changeSpeaker(characters(first))
+                case Sentence(expressions) =>
+                    val sceneNum = doExpressions(expressions)
+                    if (sceneNum != 0) {
+                        return sceneNum
+                    }
+            }
+        }
+        sceneNumber + 1
+    }
+
+    def doExpressions(expressions: List[Expression]): Int = {
         for (expr <- expressions) {
             expr match {
 
-                case Assigment(character: String, value: Value) => getCharacter(character).value = calculateValue(value)
+                case Assigment(speaker : Boolean, value: Value) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = calculateValue(value)
 
-                case PrintInt(character: String) => print(getCharacter(character).value)
-                case LoadInt(character: String) =>getCharacter(character).value = Console.in.read.toChar.asInstanceOf[Int]
-                case PrintChar(character: String) => print(getCharacter(character).value.asInstanceOf[Char])
-                case LoadChar(character: String) =>  getCharacter(character).value = Console.in.read.toChar
+                case PrintInt(speaker : Boolean) => print(getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value)
+                case LoadInt(speaker : Boolean) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = Console.in.read.toChar.asInstanceOf[Int]
+                case PrintChar(speaker : Boolean) => print(getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value.asInstanceOf[Char])
+                case LoadChar(speaker : Boolean) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = Console.in.read.toChar
 
-                case GotoS(scene: Scene) => //TODO LOW PRIO
-                case GotoA(scene: Act) => //TODO LOW PRIO
+                case GotoS(scene: Int) => {
+                    return scene
+                }
+                case GotoA(act: Int) => {
+                    actNumber = act - 1
+                    return -1
 
-                case Push(destCharacter: String, src: Value) => //TODO LOW PRIO
-                case Pop(destCharacter: String) => //TODO LOW PRIO
+                }
+
+                case Push(destCharacter: String, src: Value) => {
+                    getCharacter(destCharacter).stack.push(calculateValue(src))
+                }
+                case Pop(destCharacter: String) => {
+                    val c = getCharacter(destCharacter)
+                    c.value = c.stack.pop()
+                }
 
 
                 case ConditionalBlock(condition: Condition, expression: Expression) =>
+                    if (checkCondition(condition)) {
+                        expression
+                    }
             }
         }
+        0
     }
 
     def checkCondition(condition: Condition): Boolean = {
@@ -90,10 +111,10 @@ class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
         case Square(a: Value) => sqr(calculateValue(a))
         case SquareRoot(a: Value) => sqrt(calculateValue(a))
 
-        case CharacterValue(character: String) =>
-            if (stage.isOnStage(characters(character))) {
-                characters(character).value
+        case CharacterValue(speaker : Boolean) =>
+            if (stage.isOnStage(characters(if (speaker) stage.speaker.get.name else stage.listener.get.name ))) {
+                characters(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value
             }
-            else throw new RuntimeException(s"There is no $character on the scene.")
+            else throw new RuntimeException(s"There is no requested character on the scene.")
     }
 }
