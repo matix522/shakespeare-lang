@@ -20,49 +20,12 @@ sealed abstract class Condition extends Expression
 
 case class TODOExpression(todo: String) extends Expression { //TODO EXPRESSIONS
     override def toString = s"Some expressions"
-
-//
-//    def parse_expressions(): List[Expression] =
-//    {
-//
-//        if (todo.isEmpty) {
-//            return List[Expression]()
-//        }
-//
-//        val speaker_sentences= todo.split(":")
-//
-//        var speaker: String = speaker_sentences(0)
-//
-//        var sentences = speaker_sentences(1)
-//
-//       // List(Speaker(speaker)) ::
-//
-//        handle_sentences(sentences)
-//
-//
-//
-//
-//    }
-//
-//
-//    def handle_sentences(s : String) : List[Expression] =
-//    {
-//        if (s.isEmpty) {
-//            return List[Expression]()
-//        }
-//
-//        return List[Expression]()
-//
-//
-//    }
-//
-
 }
 
 
-case class PositiveNoun(character: String) extends Value
-case class NegativeNoun(character: String) extends Value
-case class NeutralNoun(character: String) extends Value
+case class PositiveNoun(speaker : Boolean) extends Value
+case class NegativeNoun(speaker : Boolean) extends Value
+case class NeutralNoun(speaker : Boolean) extends Value
 case class Adjective(value: Value) extends Value
 
 case class Sum(a: Value, b: Value) extends Value
@@ -74,14 +37,14 @@ case class Remainder(a: Value, b: Value) extends Value
 case class Square(a: Value) extends Value
 case class SquareRoot(a: Value) extends Value
 
-case class CharacterValue(character: String) extends Value
+case class CharacterValue(speaker : Boolean) extends Value
 
-case class Assigment(character: String, value: Value) extends Expression
+case class Assigment(speaker : Boolean, value: Value) extends Expression
 
-case class PrintInt(character: String) extends Expression
-case class LoadInt(character: String) extends Expression
-case class PrintChar(character: String) extends Expression
-case class LoadChar(character: String) extends Expression
+case class PrintInt(speaker : Boolean) extends Expression
+case class LoadInt(speaker : Boolean) extends Expression
+case class PrintChar(speaker : Boolean) extends Expression
+case class LoadChar(speaker : Boolean) extends Expression
 
 case class GotoS(scene: Int) extends Expression //TODO LOW PRIO
 case class GotoA(act: Int) extends Expression //TODO LOW PRIO
