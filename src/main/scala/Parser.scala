@@ -99,19 +99,36 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 val possesive = tokens(1)
 
                 if (dictionary.first_person_possessive.contains(possesive)) {
-                    ret.addOne(PrintInt(character))
+                    ret.addOne(PrintInt(true))
 
 
                 }
                 else if (dictionary.second_person_possessive.contains((possesive))) {
-                    ret.addOne(PrintInt(character))
+                    ret.addOne(PrintInt(false))
 
 
                 }
 
                 else throw new IllegalArgumentException(s"Error, $possesive is not a correct possesive word ")
             }
-            // else  if (s.matches())
+             else  if (s.matches("Speak .*")){
+
+              var tokens = s.split(" ")
+
+              val possesive = tokens(1)
+
+              if (dictionary.first_person_possessive.contains(possesive)) {
+                ret.addOne(PrintChar(true))
+
+
+              }
+              else if (dictionary.second_person_possessive.contains((possesive))) {
+                ret.addOne(PrintChar(false))
+
+              }
+
+              else throw new IllegalArgumentException(s"Error, $possesive is not a correct possesive word ")
+            }
 
 
         }*/

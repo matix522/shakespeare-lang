@@ -4,7 +4,7 @@ class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
     var sceneNumber = 1
     var actNumber = 1
 
-    def execute() = {
+    def execute(): Unit = {
         while (actNumber < acts.toList.length) {
             val act = acts(actNumber)
             sceneNumber = 1
@@ -15,7 +15,7 @@ class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
         }
     }
 
-    def getCharacter(character: String) = {
+    def getCharacter(character: String): Character = {
         if (stage.isOnStage(characters(character))) {
             characters(character)
         }
@@ -38,19 +38,19 @@ class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
                     }
             }
         }
-        return sceneNumber + 1
+        sceneNumber + 1
     }
 
     def doExpressions(expressions: List[Expression]): Int = {
         for (expr <- expressions) {
             expr match {
 
-                case Assigment(character: String, value: Value) => getCharacter(character).value = calculateValue(value)
+                case Assigment(speaker : Boolean, value: Value) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = calculateValue(value)
 
-                case PrintInt(character: String) => print(getCharacter(character).value)
-                case LoadInt(character: String) => getCharacter(character).value = Console.in.read.toChar.asInstanceOf[Int]
-                case PrintChar(character: String) => print(getCharacter(character).value.asInstanceOf[Char])
-                case LoadChar(character: String) => getCharacter(character).value = Console.in.read.toChar
+                case PrintInt(speaker : Boolean) => print(getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value)
+                case LoadInt(speaker : Boolean) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = Console.in.read.toChar.asInstanceOf[Int]
+                case PrintChar(speaker : Boolean) => print(getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value.asInstanceOf[Char])
+                case LoadChar(speaker : Boolean) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = Console.in.read.toChar
 
                 case GotoS(scene: Int) => {
                     return scene
@@ -76,7 +76,7 @@ class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
                     }
             }
         }
-        return 0
+        0
     }
 
     def checkCondition(condition: Condition): Boolean = {
@@ -111,10 +111,10 @@ class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
         case Square(a: Value) => sqr(calculateValue(a))
         case SquareRoot(a: Value) => sqrt(calculateValue(a))
 
-        case CharacterValue(character: String) =>
-            if (stage.isOnStage(characters(character))) {
-                characters(character).value
+        case CharacterValue(speaker : Boolean) =>
+            if (stage.isOnStage(characters(if (speaker) stage.speaker.get.name else stage.listener.get.name ))) {
+                characters(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value
             }
-            else throw new RuntimeException(s"There is no $character on the scene.")
+            else throw new RuntimeException(s"There is no requested character on the scene.")
     }
 }

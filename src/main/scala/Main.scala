@@ -12,6 +12,7 @@ object Main {
         var dictionary = new Dictionary;
 
         val sourceCode = loadFile(args(0))
+
         var parser = new Parser(sourceCode, dictionary)
         parser.parse()
     }
