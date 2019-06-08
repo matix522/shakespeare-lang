@@ -96,7 +96,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         val sentences = str.split("\\.|!|\\?").toList
         for (s <- sentences) {
-            val printInt = "(Open) (.*) (heart)".r.findFirstMatchIn(s)
+            val printInt = "(open) (.*) (heart)".r.findFirstMatchIn(s)
             if (printInt.nonEmpty) {
 
                 val possessive =  printInt.get.group(2).toLowerCase
@@ -107,7 +107,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                     ret.addOne(PrintInt(false))
                 else throw new IllegalArgumentException(s"Error, $possessive is not a correct possesive word ")
             }
-            val printChar = "(Speak) (.*) (.)".r.findFirstMatchIn(s)
+            val printChar = "(speak) (.*) (.)".r.findFirstMatchIn(s)
             if (printChar.nonEmpty) {
 
                 val possessive = printChar.get.group(2).toLowerCase
