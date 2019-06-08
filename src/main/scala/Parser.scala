@@ -79,13 +79,98 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 case enterRegex("Exit", _, _, _, first, _, _) => Exit(first)
                 case _ => throw new IllegalArgumentException(s"Incorect [Enter/Exit] block $regMatch")
             }
-            sceneParts.addOne(Sentence(List(TODOExpression(dialogs(i)))))
+
+            // TODO somehow add speaker
+            //sceneParts.addOne(Sentence(List(TODOExpression(dialogs(i)))))
+
+            sceneParts.addAll(parse_statements(dialogs(i)))
+
             i += 1
             sceneParts.addOne(enterExitBlock)
         }
 
         (id, new Scene(id, sceneParts.toList))
     }
+
+    def parse_statements(s : String) : List[ScenePart] =
+    {
+
+        var characters  = s.split("\n[A-Z,a-z]*:\n")
+
+        var ret = new ListBuffer[ScenePart]
+
+        for (c <- characters)
+            {
+                var character_sentences = c.split(":")
+
+                var character = character_sentences(0).trim()
+
+                var sentences = character_sentences(1)
+
+                if (!dictionary.character.contains(character)){
+
+                    throw new IllegalArgumentException(s"ERROR! Character $character is not an Shakespeare character!")
+                }
+
+                ret+= Speaker(character)
+
+                ret += parse_sentences(sentences, character)
+
+            }
+
+
+        ret.toList
+
+    }
+
+    def parse_sentences(str: String, character: String) : Sentence =
+    {
+
+        var ret = new ListBuffer[Expression]
+
+        val sentences = str.split(". ")
+
+        for (s <- sentences){
+
+           if (s.matches("Open .*")){
+
+               var tokens = s.split(" ")
+
+               val possesive = tokens(1)
+
+               if (dictionary.first_person_possessive.contains(possesive))
+                   {
+                       ret.addOne(PrintInt(character))
+
+
+                   }
+               else if (dictionary.second_person_possessive.contains((possesive)))
+                   {
+                       ret.addOne(PrintInt(character))
+
+
+                   }
+
+               else throw  new IllegalArgumentException(s"Error, $possesive is not a correct possesive word ")
+           }
+          // else  if (s.matches())
+
+
+
+
+
+
+
+        }
+
+        Sentence(ret.toList)
+    }
+
+
+
+
+
+
 
     def RomanToInt(roman: String) : Int = {
 

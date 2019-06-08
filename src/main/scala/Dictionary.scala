@@ -27,9 +27,6 @@ class Dictionary ()
   var second_person_reflexive: mutable.Set[String] = mutable.Set[String]()
   var third_person_possessive: mutable.Set[String] = mutable.Set[String]()
 
-  val roman_numerals_map : Map[String,Int] = Map("M" -> 1000, "D" -> 500,
-  "C" -> 100, "L" -> 50, "X" -> 10, "V" -> 5, "I" -> 1)
-
 
   var file : String = directory + "article" + file_extension
 
