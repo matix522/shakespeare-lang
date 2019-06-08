@@ -20,7 +20,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         charactersList.trim.split("\n").toList.map(s => new Character(s.split(",")(0), 0))
     }
 
-    def parseAct(actCode: String): (Int,Act) = {
+    def parseAct(actCode: String): (Int, Act) = {
         val id = RomanToInt(actCode.split(":")(0).trim())
 
         var scenesCode = actCode.split("Scene ").toList
@@ -35,8 +35,8 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     def parseScene(sceneCode: String): (Int, Scene) = {
         val id = RomanToInt(sceneCode.split(":")(0).trim())
-        val sentences = sceneCode.split(".")
-        val code = sentences.slice(1,sentences.length).mkString(".")
+        val sentences = sceneCode.split("\\.")
+        val code = sentences.slice(1, sentences.length).mkString(".")
 
         val sceneParts = new ListBuffer[ScenePart]
 
@@ -69,35 +69,23 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
     def parse_statements(s: String): List[ScenePart] = {
-
-        var characters = s.split("\n[A-Z,a-z]*:\n")
-
         var ret = new ListBuffer[ScenePart]
-        for (c <- characters) {
-            var character_sentences = c.split(":")
-
-            var character = character_sentences(0).trim()
-
-            var sentences = character_sentences(1)
-
-            if (!dictionary.character.contains(character)) {
-
-                throw new IllegalArgumentException(s"ERROR! Character $character is not an Shakespeare character!")
-            }
-
-            ret += Speaker(character)
-
-            ret += parse_sentences(sentences, character)
-
-        }
-
-
+        var sentences = s.split("^[A-Z,a-z]*:").filter(s => s.length > 0).toList
+        var characters = "^[A-Z,a-z]*:".r
+            .findAllMatchIn(s)
+            .map(m => m.group(0).replace(":", ""))
+            .map(s => {
+                if(!dictionary.character.contains(s)) {
+                throw new IllegalArgumentException(s"ERROR! Character $s is not an Shakespeare character!")
+            }; s })
+            .toList
+        ret.addAll(characters.map(s => Speaker(s)))
+        ret.addAll(sentences.map(s => parse_sentences(s)))
         ret.toList
-
     }
 
-    def parse_sentences(str: String, character: String): Sentence = {
-
+    def parse_sentences(str: String): Sentence = {
+/*
         var ret = new ListBuffer[Expression]
 
         val sentences = str.split(". ")
@@ -128,13 +116,13 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         }
 
-        Sentence(ret.toList)
+        Sentence(ret.toList)*/
     }
 
 
     def RomanToInt(roman: String): Int = {
         if (!roman.matches("^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$")) {
-           throw new IllegalArgumentException( s"$roman is not roman numeral")
+            throw new IllegalArgumentException(s"$roman is not roman numeral")
         }
 
 
