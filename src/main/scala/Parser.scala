@@ -30,7 +30,7 @@ class Parser(val sourceCode: String) {
         val scenes = scenesCode.slice(1, scenesCode.size).map(parseScene)
 
 
-        return new Act(id, scenes)
+        new Act(id, scenes)
     }
 
     def parseScene(sceneCode: String): Scene = {
@@ -60,7 +60,44 @@ class Parser(val sourceCode: String) {
         new Scene(id, sceneParts.toList)
     }
 
-    def isRomanNumeral(roman: String) = {
-        true //TODO Check if roman numeral
+    def RomanToInt(roman: String) : Int = {
+
+        if ( !roman.matches("^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$")) {
+                //incorrect roman number
+                return -1
+            }
+
+
+        val roman_numerals_map : Map[Char,Int] = Map('M' -> 1000, 'D' -> 500,
+            'C' -> 100, 'L' -> 50, 'X' -> 10, 'V' -> 5, 'I' -> 1)
+
+        var res: Int = 0
+
+        var i = 0
+        while ( i < roman.length) {
+
+            val s1 = roman_numerals_map(roman.charAt(i))
+
+            if (i + 1 < roman.length) {
+                val s2 = roman_numerals_map(roman.charAt(i + 1))
+
+                if (s1 >= s2) {
+                    res = res + s1
+                }
+                else {
+                    res = res + s2 - s1
+                    i += 1
+
+                }
+            }
+            else {
+                res = res + s1
+                i += 1
+            }
+
+            i += 1
+        }
+
+        res
     }
 }
