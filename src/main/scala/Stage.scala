@@ -2,13 +2,13 @@ class Stage {
     var speaker: Option[Character] = None
     var listener: Option[Character] = None
 
-    def enter(character: Character) = {
+    def enter(character: Character): Unit = {
         if (speaker.isEmpty) speaker = Some(character)
         else if (listener.isEmpty) listener = Some(character)
         else throw new RuntimeException("There are already 2 characters on stage.")
     }
 
-    def enter(character1: Character, character2: Character) = {
+    def enter(character1: Character, character2: Character): Unit = {
         if (speaker.isEmpty) speaker = Some(character1)
         else throw new RuntimeException("There are already 2 characters on stage.")
         if (listener.isEmpty) listener = Some(character2)
@@ -18,20 +18,20 @@ class Stage {
     def exit(character: Character): Unit = {
         speaker match {
             case Some(`character`) => {
-                speaker = None;
+                speaker = None
                 return
             }
         }
         listener match {
             case Some(`character`) => {
-                listener = None;
+                listener = None
                 return
             }
         }
         throw new RuntimeException(s"There is no $character on the scene.")
     }
 
-    def exeunt() = {
+    def exeunt(): Unit = {
         speaker = None
         listener = None
     }
@@ -51,7 +51,7 @@ class Stage {
         }
     }
 
-    def changeSpeaker(character: Character) = {
+    def changeSpeaker(character: Character): Unit = {
         listener match {
             case Some(`character`) => listener = speaker
             case _ => throw new RuntimeException(s"$character is not listener on scene.")
@@ -70,14 +70,14 @@ class Stage {
     }
 
 
-    def getSpeaker(): Character = {
+    def getSpeaker: Character = {
         speaker match {
             case Some(s) => s
             case None => throw new RuntimeException("There is no speaker.")
         }
     }
 
-    def getListener(): Character = {
+    def getListener: Character = {
         listener match {
             case Some(s) => s
             case None => throw new RuntimeException("There is no listener.")

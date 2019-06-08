@@ -1,5 +1,5 @@
 
-class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act]) {
+class Interpreter(var characters: Map[String, Character], val acts: List[Act]) {
     var stage = new Stage
     var sceneNumber = 1
     var actNumber = 1

@@ -1,8 +1,8 @@
 import scala.collection.mutable.ListBuffer
 
-class Parser(val sourceCode: String) {
+class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
-    def parse() = {
+    def parse(): Unit = {
         var actsCode = sourceCode.split("Act ").toList
         if (actsCode.length < 2) {
             throw new IllegalArgumentException("No acts in source code")
@@ -21,7 +21,21 @@ class Parser(val sourceCode: String) {
     }
 
     def parseAct(actCode: String): Act = {
-        val id = actCode.split(":")(0).trim() //TODO Check if roman numeral
+        val id = actCode.split(":")(0).trim()
+
+        //TODO Check if roman numeral
+
+            val act_number = RomanToInt(id)
+
+            if (act_number == -1){
+
+                // error?
+            }
+
+
+        //TODO end
+
+
         var scenesCode = actCode.split("Scene ").toList
 
         if (scenesCode.length < 2) {
@@ -30,11 +44,24 @@ class Parser(val sourceCode: String) {
         val scenes = scenesCode.slice(1, scenesCode.size).map(parseScene)
 
 
-        return new Act(id, scenes)
+        new Act(id, scenes)
     }
 
     def parseScene(sceneCode: String): (Int, Scene) = {
-        val id = sceneCode.split(":")(0).trim() //TODO Check if roman numeral
+        val id = sceneCode.split(":")(0).trim()
+
+        //TODO Check if roman numeral
+
+        val scene_number = RomanToInt(id)
+
+        if (scene_number == -1){
+
+            // error?
+        }
+
+
+        //TODO end
+
 
         val sceneParts = new ListBuffer[ScenePart]
 
@@ -60,7 +87,44 @@ class Parser(val sourceCode: String) {
         (id, new Scene(id, sceneParts.toList))
     }
 
-    def isRomanNumeral(roman: String) = {
-        true //TODO Check if roman numeral
+    def RomanToInt(roman: String) : Int = {
+
+        if ( !roman.matches("^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$")) {
+                //incorrect roman number
+                return -1
+            }
+
+
+        val roman_numerals_map : Map[Char,Int] = Map('M' -> 1000, 'D' -> 500,
+            'C' -> 100, 'L' -> 50, 'X' -> 10, 'V' -> 5, 'I' -> 1)
+
+        var res: Int = 0
+
+        var i = 0
+        while ( i < roman.length) {
+
+            val s1 = roman_numerals_map(roman.charAt(i))
+
+            if (i + 1 < roman.length) {
+                val s2 = roman_numerals_map(roman.charAt(i + 1))
+
+                if (s1 >= s2) {
+                    res = res + s1
+                }
+                else {
+                    res = res + s2 - s1
+                    i += 1
+
+                }
+            }
+            else {
+                res = res + s1
+                i += 1
+            }
+
+            i += 1
+        }
+
+        res
     }
 }
