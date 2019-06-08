@@ -72,7 +72,8 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
           .map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim)
             .toList
 
-
+// TODO names should be lowwercase
+      // also add lowercaseing in dictionary
         var characters = "[A-Z,a-z]*:".r
             .findAllMatchIn(s)
             .map(m => m.group(0).replace(":", ""))
@@ -98,11 +99,11 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         var ret = new ListBuffer[Expression]
 
-      println(str)
+     // println(str)
 
         val sentences = str.split("\\.|!|\\?").map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim).toList
         for (s <- sentences) {
-          println(s)
+         // println(s)
             val printInt = "(open) (.*) (heart)".r.findFirstMatchIn(s)
             if (printInt.nonEmpty) {
 
@@ -125,6 +126,20 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                     ret.addOne(PrintChar(false))
                 else throw new IllegalArgumentException(s"Error, $possessive is not a correct possessive word ")
             }
+
+          //TODO
+
+          // case assignment
+          // you/../.. => asignment to listener
+          //i ... => to speaker
+
+          //pomijac ewentualne are as * as
+
+
+
+          //napisac funkcje, ktora ogarnie wartosci wyrazen
+
+
         }
 
         Sentence(ret.toList)
