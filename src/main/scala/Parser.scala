@@ -52,7 +52,7 @@ class Parser(val sourceCode: String) {
                 case enterRegex("Exit", _, _, _, first, _, _) => Exit(first)
                 case _ => throw new IllegalArgumentException(s"Incorect [Enter/Exit] block $regMatch")
             }
-            sceneParts.addOne(Dialog(List(TODOExpression(dialogs(i)))))
+            sceneParts.addOne(Sentence(List(TODOExpression(dialogs(i)))))
             i += 1
             sceneParts.addOne(enterExitBlock)
         }
