@@ -114,7 +114,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
                 ret+= Speaker(character)
 
-                ret += parse_sentences(sentences)
+                ret += parse_sentences(sentences, character)
 
             }
 
@@ -123,31 +123,37 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     }
 
-    def parse_sentences(str: String) : Sentence =
+    def parse_sentences(str: String, character: String) : Sentence =
     {
 
         var ret = new ListBuffer[Expression]
 
         val sentences = str.split(". ")
 
-        // regexes
-
-        val output_int = "Open .*".r
-        val output_char = "Speak .*".r
-
-
-
-
-
-
         for (s <- sentences){
 
            if (s.matches("Open .*")){
 
-               //ret.addOne()
+               var tokens = s.split(" ")
 
+               val possesive = tokens(1)
+
+               if (dictionary.first_person_possessive.contains(possesive))
+                   {
+                       ret.addOne(PrintInt(character))
+
+
+                   }
+               else if (dictionary.second_person_possessive.contains((possesive)))
+                   {
+                       ret.addOne(PrintInt(character))
+
+
+                   }
+
+               else throw  new IllegalArgumentException(s"Error, $possesive is not a correct possesive word ")
            }
-           //else  if
+          // else  if (s.matches())
 
 
 
