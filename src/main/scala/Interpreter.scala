@@ -52,22 +52,17 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
                 case PrintChar(speaker : Boolean) => print(getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value.asInstanceOf[Char])
                 case LoadChar(speaker : Boolean) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = Console.in.read.toChar
 
-                case GotoS(scene: Int) => {
+                case GotoS(scene: Int) =>
                     return scene
-                }
-                case GotoA(act: Int) => {
+                case GotoA(act: Int) =>
                     actNumber = act - 1
                     return -1
 
-                }
-
-                case Push(destCharacter: String, src: Value) => {
+                case Push(destCharacter: String, src: Value) =>
                     getCharacter(destCharacter).stack.push(calculateValue(src))
-                }
-                case Pop(destCharacter: String) => {
+                case Pop(destCharacter: String) =>
                     val c = getCharacter(destCharacter)
                     c.value = c.stack.pop()
-                }
 
 
                 case ConditionalBlock(condition: Condition, expression: Expression) =>
@@ -98,9 +93,11 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
 
     def calculateValue(v: Value): Int = v match {
         case PositiveNoun(_) => 1
-        case NegativeNoun(_) => 1
-        case NeutralNoun(_) => -1
+        case NegativeNoun(_) => -1
+        case NeutralNoun(_) => 1
         case Adjective(value: Value) => 2 * calculateValue(value)
+
+        case JustValue(value: Int) => value
 
         case Sum(a: Value, b: Value) => calculateValue(a) + calculateValue(b)
         case Difference(a: Value, b: Value) => calculateValue(a) - calculateValue(b)
@@ -110,6 +107,14 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
 
         case Square(a: Value) => sqr(calculateValue(a))
         case SquareRoot(a: Value) => sqrt(calculateValue(a))
+
+        case SpecifiedCharacterValue(character : Character) => {
+            if (stage.isOnStage(character)) {
+                characters(character).value
+            }
+            else throw new RuntimeException(s"There is no requested character on the scene.")
+
+        }
 
         case CharacterValue(speaker : Boolean) =>
             if (stage.isOnStage(characters(if (speaker) stage.speaker.get.name else stage.listener.get.name ))) {
