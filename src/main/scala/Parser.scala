@@ -173,7 +173,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             throw new IllegalArgumentException("Error in sentence")
 
         val word = strings(0)
-       println(word)
+       //println(word)
 
         if (dictionary.character.contains(word))
             return SpecifiedCharacterValue(word)
