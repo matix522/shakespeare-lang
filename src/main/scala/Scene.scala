@@ -38,6 +38,7 @@ case class Remainder(a: Value, b: Value) extends Value
 
 case class Square(a: Value) extends Value
 case class SquareRoot(a: Value) extends Value
+case class Cube(a: Value) extends Value
 
 case class CharacterValue(speaker : Boolean) extends Value
 case class SpecifiedCharacterValue(character: String) extends Value

@@ -91,6 +91,10 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
         math.sqrt(a).toInt
     }
 
+    def cube(i: Int): Int = {
+        i*i*i
+    }
+
     def calculateValue(v: Value): Int = v match {
         case PositiveNoun(_) => 1
         case NegativeNoun(_) => -1
@@ -108,15 +112,15 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
         case Square(a: Value) => sqr(calculateValue(a))
         case SquareRoot(a: Value) => sqrt(calculateValue(a))
 
-        case SpecifiedCharacterValue(character : String) => characters(character).value
+        case Cube(a: Value) => cube(calculateValue(a))
 
+        case SpecifiedCharacterValue(character: String) =>
+            characters(character).value
 
         case CharacterValue(speaker : Boolean) =>
-            if (stage.speaker.nonEmpty && speaker)
-                stage.speaker.get.value
-            else if (stage.listener.nonEmpty && !speaker)
-                stage.listener.get.value
-
+            if (stage.speaker.nonEmpty && speaker) stage.speaker.get.value
+            else if (stage.listener.nonEmpty && !speaker) stage.listener.get.value
             else throw new RuntimeException(s"There is no requested character on the scene.")
+
     }
 }
