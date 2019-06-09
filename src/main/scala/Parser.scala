@@ -173,39 +173,67 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
 
-    def normal_value(strings: Array[String], i: Int): Int = {
+    def normal_value(strings: Array[String], i: Int): Value = {
 
+        if (i == strings.length)
+            throw new IllegalArgumentException("Error in sentence")
 
+        val word = strings(i)
 
+        // a an or the or my, mine, yours....
+        if (dictionary.article.contains(word)
+        || dictionary.first_person_possessive.contains(word)
+        || dictionary.second_person_possessive.contains(word)
+        || dictionary.third_person_possessive.contains(word)){
+            return normal_value(strings, i+1)
+        }
 
+        if (dictionary.negative_adjective.contains(word) ||
+             dictionary.neutral_adjective.contains(word) ||
+            dictionary.positive_adjective.contains(word))
+                return Adjective(normal_value(strings,i+1))
 
-        return 0
+        if (dictionary.negative_noun.contains(word))
+            return NegativeNoun(true)
+
+        if (dictionary.neutral_noun.contains(word))
+            return NeutralNoun(true)
+
+        if (dictionary.positive_noun.contains(word))
+            return PositiveNoun(true)
+
+        if (dictionary.nothing.contains(word))
+            return JustValue(0)
+
+        throw new IllegalArgumentException(s"Error in word $word")
+
 
     }
 
     def get_value(strings: Array[String]) : Value = {
 
-       return JustValue(70)
-/*
+       //return JustValue(70)
+
         var i = 1
 
         val be = strings(i)
 
-        if (!dictionary.be.contains(be)){
-            throw new IllegalArgumentException(s"Error! $be is not a correct \"be\" word")
+        if (dictionary.be.contains(be)){
+           i+=1
+            //throw new IllegalArgumentException(s"Error! $be is not a correct be word")
         }
 
-        i +=1
+        //i +=1
 
         if (strings(i) != "as"){
 
-            return JustValue(normal_value(strings,i))
+            return normal_value(strings,i)
         }
 
 
+        return JustValue(1)
 
 
-*/
 
 
 
