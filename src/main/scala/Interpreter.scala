@@ -50,7 +50,7 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
 
 
         for (expr <- expressions) {
-            println(expr)
+            //println(expr)
 //            println(stage.speaker)
 //            println(stage.listener)
             expr match {

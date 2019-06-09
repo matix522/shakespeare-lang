@@ -114,7 +114,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         val sentences = str.split("\\.|!|\\?").map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim).toList
         for (s <- sentences) {
-          println(s)
+         // println(s)
             val printInt = "(open) (.*) (heart)".r.findFirstMatchIn(s)
             val printChar = "(speak) (.*) (.)".r.findFirstMatchIn(s)
 
@@ -187,7 +187,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
                 val eval =  if_so.get.group(2).toLowerCase
 
-                println(eval)
+                //println(eval)
 
                 val s = parse_sentences(eval)
 
@@ -198,7 +198,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
                 val eval =  if_not.get.group(2).toLowerCase
 
-                println(eval)
+                //println(eval)
 
 
                 val s = parse_sentences(eval)

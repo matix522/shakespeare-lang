@@ -16,8 +16,8 @@ class Stage {
     }
 
     def exit(character: Character): Unit = {
-        println(speaker)
-        println(listener)
+        //println(speaker)
+        //println(listener)
 
         speaker match {
             case Some(`character`) =>
