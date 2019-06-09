@@ -145,27 +145,15 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
             if (dictionary.first_person.contains(assig)) {
 
-                ret.addOne(Assigment(speaker = true,get_value(tokens)))
+                ret.addOne(Assigment(speaker = true,get_value(tokens.toList)))
 
             }
 
             else if (dictionary.second_person.contains(assig)) {
 
-                ret.addOne(Assigment(speaker = false,get_value(tokens)))
+                ret.addOne(Assigment(speaker = false,get_value(tokens.toList)))
 
             }
-
-
-
-
-          //TODO
-
-          //pomijac ewentualne are as * as
-
-
-
-          //napisac funkcje, ktora ogarnie wartosci wyrazen
-
 
         }
 
@@ -173,15 +161,12 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
 
-    def normal_value(strings: Array[String], i: Int): Value = {
+    def normal_value(strings: List[String]): Value = {
 
-        if (i == strings.length)
+        if (strings.isEmpty)
             throw new IllegalArgumentException("Error in sentence")
 
-        val word = strings(i)
-
-        //TOdO chyba tutaj dodac sprawdzenie, czy czasem nie odnosimy sie do jakiejs postaci
-        // jak tak, to zwrocic pobranie jej wartosci
+        val word = strings(0)
 
         if (dictionary.character.contains(word))
             return SpecifiedCharacterValue(word)
@@ -197,13 +182,13 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         || dictionary.first_person_possessive.contains(word)
         || dictionary.second_person_possessive.contains(word)
         || dictionary.third_person_possessive.contains(word)){
-            return normal_value(strings, i+1)
+            return normal_value(strings.slice(1,strings.length))
         }
 
         if (dictionary.negative_adjective.contains(word) ||
              dictionary.neutral_adjective.contains(word) ||
             dictionary.positive_adjective.contains(word))
-                return Adjective(normal_value(strings,i+1))
+                return Adjective(normal_value(strings.slice(1,strings.length)))
 
         if (dictionary.negative_noun.contains(word))
             return NegativeNoun(true)
@@ -222,120 +207,158 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     }
 
-    def difference(strings: Array[String], j: Int): Value = {
+    def difference(strings: List[String]): Value = {
 
-        var i = j
+        var tail = strings
 
+        //JustValue(60)
 
+        //znajdz miejsce, gdzie jest and od aktualnej operacji
+        // podziel na strings :: "and" :: tail
 
+        Difference(choose_operation(strings),choose_operation(tail))
+    }
+
+    def sum(strings: List[String]): Value = {
+        var tail = strings
+
+        //JustValue(60)
+
+        //znajdz miejsce, gdzie jest and od aktualnej operacji
+        // podziel na strings :: "and" :: tail
+
+        Difference(choose_operation(strings),choose_operation(tail))
+    }
+
+    def product(strings: List[String]): Value = {
+        var tail = strings
+
+        //JustValue(60)
+
+        //znajdz miejsce, gdzie jest and od aktualnej operacji
+        // podziel na strings :: "and" :: tail
+
+        Difference(choose_operation(strings),choose_operation(tail))
+    }
+
+    def quotient(strings: List[String]): Value = {
+        var tail = strings
+
+        //JustValue(60)
+
+        //znajdz miejsce, gdzie jest and od aktualnej operacji
+        // podziel na strings :: "and" :: tail
+
+        Difference(choose_operation(strings),choose_operation(tail))
+    }
+
+    def square(strings: List[String]): Value = {
+
+        Square(choose_operation(strings))
 
     }
 
-    def sum(strings: Array[String], j: Int): Value = {
-        var i = j
+    def square_root(strings: List[String]): Value = {
 
-
+        SquareRoot(choose_operation(strings))
     }
 
-    def product(strings: Array[String], j: Int): Value = {
-
-        var i = j
-
-    }
-
-    def quotient(strings: Array[String], j: Int): Value = {
-        var i = j
-
-
-
-    }
-
-    def square(strings: Array[String], j: Int): Value = {
-
-        var i = j
-
-
-    }
-
-    def square_root(strings: Array[String], j: Int): Value = {
-        val i = j
-        SquareRoot(choose_operation(strings,i))
-    }
-
-    def cube(strings: Array[String], j: Int): Value =
+    def cube(strings: List[String]): Value =
     {
-        val i = j
-        Cube(choose_operation(strings,i))
+
+        Cube(choose_operation(strings))
 
     }
 
-    def twice(strings: Array[String], j: Int): Value =
+    def twice(strings: List[String]): Value =
     {
-        val i = j
 
-        Product(JustValue(2),choose_operation(strings,i))
+        Product(JustValue(2),choose_operation(strings))
     }
 
-    def choose_operation(strings: Array[String], j: Int): Value =
+    def remainder(strings: List[String]): Value = {
+
+        var tail = strings
+
+        //JustValue(60)
+
+        //znajdz miejsce, gdzie jest and od aktualnej operacji
+        // podziel na strings :: "and" :: tail
+
+        Difference(choose_operation(strings),choose_operation(tail))
+    }
+
+    def choose_operation(strings: List[String]): Value =
     {
-        var i = j
 
-        if (strings(i) == "the") i+=1
-        //throw new IllegalArgumentException("Expected the after as * as")
+        strings match {
 
-        strings(i) match {
+            case "the" :: tail =>
+            {
+                tail match {
 
-            case "difference" => difference(strings,i+2)
-            case "sum" => sum(strings,i+2)
-            case "product" =>  product(strings,i+2)
-            case "quotient" =>  quotient(strings,i+2)
-            case "remainder" => quotient(strings,i+5)
-            case "square" =>{
-                i+=1
-                strings(i) match {
-                    case "of" => square(strings, i+1)
-                    case "root" => square_root(strings,i+2)
-                    case _ => throw new IllegalArgumentException(s"Unexpected word after square")
+                    case "difference" :: "between" :: tail1 => difference(tail1)
+                    case "sum" :: "of" :: tail1 => sum(tail1)
+                    case "product" :: "of" :: tail1 =>  product(tail1)
+                    case "quotient" :: "between" :: tail1 =>  quotient(tail1)
+                    case "remainder" :: "of" :: "the" :: "quotient" :: "between" :: tail1 => remainder(tail1)
+                    case "square" :: "of" :: tail1 => square(tail1)
+                    case "square" :: "root" :: "of" :: tail1 => square_root(tail1)
+                    case "cube" :: "of" :: tail1 => cube(tail1)
+                    case "twice" :: tail1 => twice(tail)
+                    case tail1 =>  normal_value(tail1)
                 }
             }
-            case "cube" => cube(strings,i+2)
-            case "twice" => twice(strings,i+1)
-            case _ =>  normal_value(strings,i)
-        }
 
+            case tail =>
+            {
+                tail match {
+
+                    case "difference" :: "between" :: tail1 => difference(tail1)
+                    case "sum" :: "of" :: tail1 => sum(tail1)
+                    case "product" :: "of" :: tail1 =>  product(tail1)
+                    case "quotient" :: "between" :: tail1 =>  quotient(tail1)
+                    case "remainder" :: "of" :: "the" :: "quotient" :: "between" :: tail1 => remainder(tail1)
+                    case "square" :: "of" :: tail1 => square(tail1)
+                    case "square" :: "root" :: "of" :: tail1 => square_root(tail1)
+                    case "cube" :: "of" :: tail1 => cube(tail1)
+                    case "twice" :: tail1 => twice(tail)
+                    case tail1 =>  normal_value(tail1)
+                }
+            }
+
+        }
 
     }
 
 
-    def get_value(strings: Array[String]) : Value = {
+    def get_value(strings: List[String]) : Value = {
 
-       //return JustValue(70)
+        strings match {
 
-        var i = 1
+            case _ :: "the" :: tail =>
+            {
+                tail match {
 
-        val be = strings(i)
+                    case _ :: _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
+                    case _ :: _ :: tail1 => normal_value(tail1)
 
-        if (dictionary.be.contains(be)){
-           i+=1
-            //throw new IllegalArgumentException(s"Error! $be is not a correct be word")
+                }
+            }
+
+            case _ :: tail =>
+            {
+                tail match {
+
+                    case _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
+                    case _ :: tail1 => normal_value(tail1)
+
+                }
+
+            }
         }
-
-        //i +=1
-
-        if (strings(i) != "as"){
-
-            return normal_value(strings,i)
-        }
-
-        i+=3
-        return choose_operation(strings,i)
-
-
 
     }
-
-
-
 
 
     def RomanToInt(roman: String): Int = {
