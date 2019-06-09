@@ -142,6 +142,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             var tokens = s.split(" ")
 
             var assig = tokens(0)
+            println(assig)
 
             if (dictionary.first_person.contains(assig)) {
 
@@ -167,14 +168,15 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             throw new IllegalArgumentException("Error in sentence")
 
         val word = strings(0)
+        println(word)
 
         if (dictionary.character.contains(word))
             return SpecifiedCharacterValue(word)
 
-        if (dictionary.first_person.contains(word))
+        if (dictionary.first_person_reflexive.contains(word))
             return CharacterValue(true)
 
-        if (dictionary.second_person.contains(word))
+        if (dictionary.second_person_reflexive.contains(word))
             return CharacterValue(false)
 
         // a an or the or my, mine, yours....
@@ -206,7 +208,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
 
     }
-
+/*
     def difference(strings: List[String]): Value = {
 
         var tail = strings
@@ -288,6 +290,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         Difference(choose_operation(strings),choose_operation(tail))
     }
 
+
     def choose_operation(strings: List[String]): Value =
     {
 
@@ -330,33 +333,129 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         }
 
     }
+*/
+
+    def choose_operation(words: List[String]): Value = {
+        val line = words.mkString(" ")
+
+        words match {
+            case "the" :: "difference" :: "between" :: tail =>
+                val regex = "(the difference between )(.*) and (.*)".r
+                val regMatch = regex.findFirstMatchIn(line).get
+                return Difference(
+                    choose_operation(regMatch.group(2).split(" ").toList),
+                    choose_operation(regMatch.group(3).split(" ").toList))
+            case "the" :: "sum" :: "of" :: tail =>
+                val regex = "(the sum of )(.*) and (.*)".r
+                val regMatch = regex.findFirstMatchIn(line).get
+                return Sum(
+                    choose_operation(regMatch.group(2).split(" ").toList),
+                    choose_operation(regMatch.group(3).split(" ").toList))
+            case "the" :: "product" :: "of" :: tail =>
+                val regex = "(the product of )(.*) and (.*)".r
+                val regMatch = regex.findFirstMatchIn(line).get
+                return Product(
+                    choose_operation(regMatch.group(2).split(" ").toList),
+                    choose_operation(regMatch.group(3).split(" ").toList))
+
+            case "the" :: "cube" :: "of" :: tail =>
+                val regex = "(the cube of )(.*)".r
+                val regMatch = regex.findFirstMatchIn(line).get
+                return Cube(
+                    choose_operation(regMatch.group(2).split(" ").toList))
+
+            case "twice" :: tail =>
+                val regex = "(twice )(.*)".r
+                val regMatch = regex.findFirstMatchIn(line).get
+                return Product(
+                    choose_operation(regMatch.group(2).split(" ").toList),JustValue(2))
+
+
+            case "the" :: "quotient" :: "between" :: tail =>
+                val regex = "(the quotient between )(.*) and (.*)".r
+                val regMatch = regex.findFirstMatchIn(line).get
+                return Quotient(
+                    choose_operation(regMatch.group(2).split(" ").toList),
+                    choose_operation(regMatch.group(3).split(" ").toList))
+            case "the" :: "square" :: "of" :: tail =>
+                val regex = "(the square of )(.*)".r
+                val regMatch = regex.findFirstMatchIn(line).get
+                return Square(
+                    choose_operation(regMatch.group(2).split(" ").toList))
+            case "the" :: "square" :: "root" :: "of" :: tail =>
+                val regex = "(the square root of )(.*)".r
+                val regMatch = regex.findFirstMatchIn(line).get
+                return SquareRoot(
+                    choose_operation(regMatch.group(2).split(" ").toList))
+            case "the" :: "remainder" :: "between" :: tail =>
+                val regex = "(the remainder between )(.*) and (.*)".r
+                val regMatch = regex.findFirstMatchIn(line).get
+                return Remainder(
+                    choose_operation(regMatch.group(2).split(" ").toList),
+                    choose_operation(regMatch.group(3).split(" ").toList))
+            case constant => return normal_value(words)
+        }
+    }
 
 
     def get_value(strings: List[String]) : Value = {
 
-        strings match {
-
-            case _ :: "the" :: tail =>
+        if (dictionary.be.contains(strings(1)))
             {
-                tail match {
+                strings match {
 
-                    case _ :: _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
-                    case _ :: _ :: tail1 => normal_value(tail1)
+                    case _ :: _ :: "the" :: tail =>
+                    {
+                        tail match {
+
+                            case _ :: _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
+                            case _ :: _ :: tail1 => normal_value(tail1)
+
+                        }
+                    }
+
+                    case _ ::_ :: tail =>
+                    {
+                        tail match {
+
+                            case _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
+                            case _ :: tail1 => normal_value(tail1)
+
+                        }
+
+                    }
+                }
+
+
+            }
+        else {
+
+            strings match {
+
+                case _ :: "the" :: tail =>
+                {
+                    tail match {
+
+                        case _ :: _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
+                        case _ :: _ :: tail1 => normal_value(tail1)
+
+                    }
+                }
+
+                case _ :: tail =>
+                {
+                    tail match {
+
+                        case _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
+                        case _ :: tail1 => normal_value(tail1)
+
+                    }
 
                 }
             }
 
-            case _ :: tail =>
-            {
-                tail match {
-
-                    case _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
-                    case _ :: tail1 => normal_value(tail1)
-
-                }
-
-            }
         }
+
 
     }
 
