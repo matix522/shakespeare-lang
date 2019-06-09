@@ -213,50 +213,134 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
 
     }
-/*
+
     def difference(strings: List[String]): Value = {
 
-        var tail = strings
+        var deep = 1
+        var i = 0
 
-        //JustValue(60)
+        var add_deep = Set("difference","sum","product",
+            "quotient","remainder")
+
+        while ( i < strings.length && deep > 0)
+        {
+            if (strings(i) == "and")
+            {
+                deep -=1
+            }
+
+            if (add_deep.contains(strings(i)))
+                deep+=1
+
+            i+=1
+
+        }
+
+        if ( deep != 0)
+            throw new IllegalArgumentException("Some error")
+
+        i -=1
 
         //znajdz miejsce, gdzie jest and od aktualnej operacji
         // podziel na strings :: "and" :: tail
 
-        Difference(choose_operation(strings),choose_operation(tail))
+        Difference(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
     }
 
     def sum(strings: List[String]): Value = {
-        var tail = strings
+        var deep = 1
+        var i = 0
 
-        //JustValue(60)
+        var add_deep = Set("difference","sum","product",
+            "quotient","remainder")
+
+        while ( i < strings.length && deep > 0)
+        {
+            if (strings(i) == "and")
+            {
+                deep -=1
+            }
+
+            if (add_deep.contains(strings(i)))
+                deep+=1
+
+            i+=1
+
+        }
+
+        if ( deep != 0)
+            throw new IllegalArgumentException("Some error")
+
+        i -=1
 
         //znajdz miejsce, gdzie jest and od aktualnej operacji
         // podziel na strings :: "and" :: tail
 
-        Difference(choose_operation(strings),choose_operation(tail))
+        Sum(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
     }
 
     def product(strings: List[String]): Value = {
-        var tail = strings
+        var deep = 1
+        var i = 0
 
-        //JustValue(60)
+        var add_deep = Set("difference","sum","product",
+            "quotient","remainder")
+
+        while ( i < strings.length && deep > 0)
+        {
+            if (strings(i) == "and")
+            {
+                deep -=1
+            }
+
+            if (add_deep.contains(strings(i)))
+                deep+=1
+
+            i+=1
+
+        }
+
+        if ( deep != 0)
+            throw new IllegalArgumentException("Some error")
+
+        i -=1
 
         //znajdz miejsce, gdzie jest and od aktualnej operacji
         // podziel na strings :: "and" :: tail
 
-        Difference(choose_operation(strings),choose_operation(tail))
+    Product(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
     }
 
     def quotient(strings: List[String]): Value = {
-        var tail = strings
+        var deep = 1
+        var i = 0
 
-        //JustValue(60)
+        var add_deep = Set("difference","sum","product",
+            "quotient","remainder")
+
+        while ( i < strings.length && deep > 0)
+        {
+            if (strings(i) == "and")
+            {
+                deep -=1
+            }
+
+            if (add_deep.contains(strings(i)))
+                deep+=1
+
+            i+=1
+
+        }
+
+        if ( deep != 0)
+            throw new IllegalArgumentException("Some error")
+
+        i -=1
 
         //znajdz miejsce, gdzie jest and od aktualnej operacji
         // podziel na strings :: "and" :: tail
 
-        Difference(choose_operation(strings),choose_operation(tail))
+        Quotient(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
     }
 
     def square(strings: List[String]): Value = {
@@ -285,14 +369,35 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     def remainder(strings: List[String]): Value = {
 
-        var tail = strings
+        var deep = 1
+        var i = 0
 
-        //JustValue(60)
+        var add_deep = Set("difference","sum","product",
+            "quotient","remainder")
+
+        while ( i < strings.length && deep > 0)
+        {
+            if (strings(i) == "and")
+            {
+                deep -=1
+            }
+
+            if (add_deep.contains(strings(i)))
+                deep+=1
+
+            i+=1
+
+        }
+
+        if ( deep != 0)
+            throw new IllegalArgumentException("Some error")
+
+        i -=1
 
         //znajdz miejsce, gdzie jest and od aktualnej operacji
         // podziel na strings :: "and" :: tail
 
-        Difference(choose_operation(strings),choose_operation(tail))
+        Remainder(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
     }
 
 
@@ -302,44 +407,40 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         strings match {
 
             case "the" :: tail =>
-            {
-                tail match {
+            tail match {
 
-                    case "difference" :: "between" :: tail1 => difference(tail1)
-                    case "sum" :: "of" :: tail1 => sum(tail1)
-                    case "product" :: "of" :: tail1 =>  product(tail1)
-                    case "quotient" :: "between" :: tail1 =>  quotient(tail1)
-                    case "remainder" :: "of" :: "the" :: "quotient" :: "between" :: tail1 => remainder(tail1)
-                    case "square" :: "of" :: tail1 => square(tail1)
-                    case "square" :: "root" :: "of" :: tail1 => square_root(tail1)
-                    case "cube" :: "of" :: tail1 => cube(tail1)
-                    case "twice" :: tail1 => twice(tail)
-                    case tail1 =>  normal_value(tail1)
-                }
+                case "difference" :: "between" :: tail1 => difference(tail1)
+                case "sum" :: "of" :: tail1 => sum(tail1)
+                case "product" :: "of" :: tail1 =>  product(tail1)
+                case "quotient" :: "between" :: tail1 =>  quotient(tail1)
+                case "remainder" :: "of" :: "the" :: "quotient" :: "between" :: tail1 => remainder(tail1)
+                case "square" :: "of" :: tail1 => square(tail1)
+                case "square" :: "root" :: "of" :: tail1 => square_root(tail1)
+                case "cube" :: "of" :: tail1 => cube(tail1)
+                case "twice" :: tail1 => twice(tail1)
+                case tail1 =>  normal_value(tail1)
             }
 
             case tail =>
-            {
-                tail match {
+            tail match {
 
-                    case "difference" :: "between" :: tail1 => difference(tail1)
-                    case "sum" :: "of" :: tail1 => sum(tail1)
-                    case "product" :: "of" :: tail1 =>  product(tail1)
-                    case "quotient" :: "between" :: tail1 =>  quotient(tail1)
-                    case "remainder" :: "of" :: "the" :: "quotient" :: "between" :: tail1 => remainder(tail1)
-                    case "square" :: "of" :: tail1 => square(tail1)
-                    case "square" :: "root" :: "of" :: tail1 => square_root(tail1)
-                    case "cube" :: "of" :: tail1 => cube(tail1)
-                    case "twice" :: tail1 => twice(tail)
-                    case tail1 =>  normal_value(tail1)
-                }
+                case "difference" :: "between" :: tail1 => difference(tail1)
+                case "sum" :: "of" :: tail1 => sum(tail1)
+                case "product" :: "of" :: tail1 =>  product(tail1)
+                case "quotient" :: "between" :: tail1 =>  quotient(tail1)
+                case "remainder" :: "of" :: "the" :: "quotient" :: "between" :: tail1 => remainder(tail1)
+                case "square" :: "of" :: tail1 => square(tail1)
+                case "square" :: "root" :: "of" :: tail1 => square_root(tail1)
+                case "cube" :: "of" :: tail1 => cube(tail1)
+                case "twice" :: tail1 => twice(tail1)
+                case tail1 =>  normal_value(tail1)
             }
 
         }
 
     }
-*/
 
+/*
     def choose_operation(words: List[String]): Value = {
         val line = words.mkString(" ")
 
@@ -347,6 +448,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             case "the" :: "difference" :: "between" :: tail =>
                 val regex = "(the difference between )(.*) and (.*)".r
                 val regMatch = regex.findFirstMatchIn(line).get
+
                  Difference(
                     choose_operation(regMatch.group(2).split(" ").toList),
                     choose_operation(regMatch.group(3).split(" ").toList))
@@ -359,6 +461,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             case "the" :: "product" :: "of" :: tail =>
                 val regex = "(the product of )(.*) and (.*)".r
                 val regMatch = regex.findFirstMatchIn(line).get
+
                  Product(
                     choose_operation(regMatch.group(2).split(" ").toList),
                     choose_operation(regMatch.group(3).split(" ").toList))
@@ -401,7 +504,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             case constant =>  normal_value(words)
         }
     }
-
+*/
 
     def get_value(strings: List[String]) : Value = {
 
