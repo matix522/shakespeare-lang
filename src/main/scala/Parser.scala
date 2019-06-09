@@ -180,6 +180,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         val word = strings(i)
 
+        //TOdO chyba tutaj dodac sprawdzenie, czy czasem nie odnosimy sie do jakiejs postaci
+        // jak tak, to zwrocic pobranie jej wartosci
+
         // a an or the or my, mine, yours....
         if (dictionary.article.contains(word)
         || dictionary.first_person_possessive.contains(word)
@@ -247,14 +250,13 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     def square_root(strings: Array[String], j: Int): Value = {
         var i = j
-
-
+        SquareRoot(choose_operation(strings,i))
     }
 
     def cube(strings: Array[String], j: Int): Value =
     {
-        var i = j
-
+        val i = j
+        Cube(choose_operation(strings,i))
 
     }
 
