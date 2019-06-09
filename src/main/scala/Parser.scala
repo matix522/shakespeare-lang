@@ -406,7 +406,6 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     def get_value(strings: List[String]) : Value = {
 
 
-
         if (dictionary.be.contains(strings(1)))
             {
                 strings match {
@@ -416,17 +415,12 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
                         case "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
                         case tail1 => normal_value(tail1)
-
                     }
-
                 }
-
-
             }
         else {
 
             strings match {
-
                 case _ :: tail =>
                 tail match {
 
@@ -435,10 +429,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
                 }
             }
-
         }
-
-
     }
 
 
