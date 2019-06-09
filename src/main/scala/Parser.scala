@@ -183,6 +183,15 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         //TOdO chyba tutaj dodac sprawdzenie, czy czasem nie odnosimy sie do jakiejs postaci
         // jak tak, to zwrocic pobranie jej wartosci
 
+        if (dictionary.character.contains(word))
+            return SpecifiedCharacterValue(word)
+
+        if (dictionary.first_person.contains(word))
+            return CharacterValue(true)
+
+        if (dictionary.second_person.contains(word))
+            return CharacterValue(false)
+
         // a an or the or my, mine, yours....
         if (dictionary.article.contains(word)
         || dictionary.first_person_possessive.contains(word)
@@ -249,7 +258,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
     def square_root(strings: Array[String], j: Int): Value = {
-        var i = j
+        val i = j
         SquareRoot(choose_operation(strings,i))
     }
 
