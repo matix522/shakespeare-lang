@@ -19,13 +19,13 @@ class Stage {
         speaker match {
             case Some(`character`) =>
                 speaker = None
-                return
+
             case _ =>
         }
         listener match {
             case Some(`character`) =>
                 listener = None
-                return
+
             case _ => throw new RuntimeException(s"There is no $character on the scene.")
         }
 
