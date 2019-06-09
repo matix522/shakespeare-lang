@@ -14,10 +14,27 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         val acts = actsCode.slice(1, actsCode.size).map(parseAct).toMap
 
         //println(acts)
+
+        // interpreter testing
+
+//        for (i <- charactersList)
+//            println(i)
+
+        val charactersMap = charactersList.map(a => a.name.toLowerCase.trim -> a).toMap
+//
+//        for (i <- charactersMap)
+//            println(i._1)
+
+        val interpreter = new Interpreter(charactersMap,acts)
+
+        interpreter.execute()
+
+
+
     }
 
     def parseCharacters(charactersList: String): List[Character] = {
-        charactersList.trim.split("\n").toList.map(s => new Character(s.split(",")(0), 0))
+        charactersList.trim.split("\n").toList.map(s => new Character(s.split(",")(0).toLowerCase.trim, 0))
     }
 
     def parseAct(actCode: String): (Int, Act) = {
@@ -47,17 +64,13 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         var i = 0
         for (regMatch <- enterRegex.findAllMatchIn(code)) {
             val enterExitBlock = regMatch match {
-                case enterRegex("Exeunt", _, _, _, first, " and ", second) => Exeunt(Some(first.trim), Some(second.trim))
+                case enterRegex("Exeunt", _, _, _, first, " and ", second) => Exeunt(Some(first.trim.toLowerCase), Some(second.trim.toLowerCase))
                 case enterRegex("Exeunt", _, _, _, _, _, _) => Exeunt(None, None)
-                case enterRegex("Enter", _, _, _, first, " and ", second) => Enter(first, Some(second.trim))
-                case enterRegex("Enter", _, _, _, first, _, _) => Enter(first, None)
-                case enterRegex("Exit", _, _, _, first, _, _) => Exit(first)
+                case enterRegex("Enter", _, _, _, first, " and ", second) => Enter(first.toLowerCase.trim, Some(second.trim.toLowerCase))
+                case enterRegex("Enter", _, _, _, first, _, _) => Enter(first.toLowerCase.trim, None)
+                case enterRegex("Exit", _, _, _, first, _, _) => Exit(first.toLowerCase.trim)
                 case _ => throw new IllegalArgumentException(s"Incorect [Enter/Exit] block $regMatch")
             }
-
-            // TODO somehow add speaker
-            //sceneParts.addOne(Sentence(List(TODOExpression(dialogs(i)))))
-
 
             sceneParts.addAll(parse_statements(dialogs(i)))
 
@@ -72,15 +85,12 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
           .map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim)
             .toList
 
-// TODO names should be lowwercase
-      // also add lowercaseing in dictionary
+
         var characters = "[A-Z,a-z]*:".r
             .findAllMatchIn(s)
-            .map(m => m.group(0).replace(":", ""))
+            .map(m => m.group(0).replace(":", "")).map(a => a.toLowerCase.trim)
             .map(s => {
-                if (!dictionary.character.contains(s)) {
-                    throw new IllegalArgumentException(s"ERROR! Character $s is not an Shakespeare character!")
-                };
+                if (!dictionary.character.contains(s)) throw new IllegalArgumentException(s"ERROR! Character $s is not an Shakespeare character!")
                 s
             })
             .toList
@@ -114,6 +124,8 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 else if (dictionary.second_person_possessive.contains(possessive))
                     ret.addOne(PrintInt(false))
                 else throw new IllegalArgumentException(s"Error, $possessive is not a correct possesive word ")
+
+
             }
             val printChar = "(speak) (.*) (.)".r.findFirstMatchIn(s)
             if (printChar.nonEmpty) {
@@ -127,11 +139,26 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 else throw new IllegalArgumentException(s"Error, $possessive is not a correct possessive word ")
             }
 
-          //TODO
+            var tokens = s.split(" ")
 
-          // case assignment
-          // you/../.. => asignment to listener
-          //i ... => to speaker
+            var assig = tokens(0)
+
+            if (dictionary.first_person.contains(assig)) {
+
+                ret.addOne(Assigment(speaker = true,get_value(tokens)))
+
+            }
+
+            else if (dictionary.second_person.contains(assig)) {
+
+                ret.addOne(Assigment(speaker = false,get_value(tokens)))
+
+            }
+
+
+
+
+          //TODO
 
           //pomijac ewentualne are as * as
 
@@ -144,6 +171,23 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         Sentence(ret.toList)
     }
+
+
+    def get_value(strings: Array[String]) : Value = {
+
+        PositiveNoun(true)
+
+
+
+
+
+
+
+
+    }
+
+
+
 
 
     def RomanToInt(roman: String): Int = {
