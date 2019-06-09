@@ -72,7 +72,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 case _ => throw new IllegalArgumentException(s"Incorect [Enter/Exit] block $regMatch")
             }
 
-            println(dialogs(i))
+            //println(dialogs(i))
             sceneParts.addAll(parse_statements(dialogs(i)))
 
             i += 1
@@ -114,7 +114,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         val sentences = str.split("\\.|!|\\?").map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim).toList
         for (s <- sentences) {
-         // println(s)
+          println(s)
             val printInt = "(open) (.*) (heart)".r.findFirstMatchIn(s)
             val printChar = "(speak) (.*) (.)".r.findFirstMatchIn(s)
 
@@ -136,7 +136,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
             val s_split = s.split(" ")
 
-            //println(s_split.slice(0,2).mkString(" "))
+           // println(s_split.slice(0,2).mkString(" "))
 
             if (goto.contains(s_split.slice(0,2).mkString(" ")))
             {
@@ -187,6 +187,8 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
                 val eval =  if_so.get.group(2).toLowerCase
 
+                println(eval)
+
                 val s = parse_sentences(eval)
 
                 ret.addOne(Then(if_not = false,s.expressions.head))
@@ -195,6 +197,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             else if (if_not.nonEmpty) {
 
                 val eval =  if_not.get.group(2).toLowerCase
+
+                println(eval)
+
 
                 val s = parse_sentences(eval)
 
@@ -210,9 +215,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
                 val possessive =  push.get.group(2).toLowerCase
 
-                if (dictionary.first_person_possessive.contains(possessive))
+                if (dictionary.first_person_reflexive.contains(possessive))
                     ret.addOne(Push(true))
-                else if (dictionary.second_person_possessive.contains(possessive))
+                else if (dictionary.second_person_reflexive.contains(possessive))
                     ret.addOne(Push(false))
                 else throw new IllegalArgumentException(s"Error, $possessive is not a correct possesive word ")
 

@@ -4,6 +4,9 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
     var sceneNumber = 1
     var actNumber = 1
 
+    var was_condition = false
+    var condition_was = false
+
     def execute(): Unit = {
         while (actNumber <= acts.toList.length) {
             val act = acts(actNumber)
@@ -24,7 +27,7 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
 
     def doScene(scene: Scene): Int = {
         for (scenePart <- scene.sceneParts) {
-            println(scenePart)
+            //println(scenePart)
             scenePart match {
                 case Enter(first, None) => stage.enter(characters(first))
                 case Enter(first, second) => stage.enter(characters(first), characters(second.get))
@@ -44,11 +47,12 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
 
     def doExpressions(expressions: List[Expression]): Int = {
 
-        var was_condition = false
-        var condition_was = false
+
 
         for (expr <- expressions) {
-           // println(expr)
+            println(expr)
+//            println(stage.speaker)
+//            println(stage.listener)
             expr match {
 
                 case Assigment(speaker : Boolean, value: Value) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = calculateValue(value)
@@ -69,7 +73,8 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
                       .stack.push(if (speaker) stage.getSpeaker.value else stage.getListener.value)
                 case Pop() =>
                     val c = getCharacter(stage.getListener.name)
-                    c.value = c.stack.pop()
+                    c.value = c.stack.top
+                    c.stack.pop()
 
 
                 case Then(if_not : Boolean, expression : Expression) =>
