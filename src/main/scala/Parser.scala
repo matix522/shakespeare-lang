@@ -400,20 +400,24 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     def get_value(strings: List[String]) : Value = {
 
+        //println(strings(0))
+       // println(strings(1))
+       // println("#######")
+
         if (dictionary.be.contains(strings(1)))
             {
                 strings match {
 
-                    case _ :: _ :: "the" :: tail =>
+                    case _ :: _ :: tail =>
                     {
                         tail match {
 
-                            case _ :: _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
-                            case _ :: _ :: tail1 => normal_value(tail1)
+                            case "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
+                            case tail1 => normal_value(tail1)
 
                         }
                     }
-
+/*
                     case _ ::_ :: tail =>
                     {
                         tail match {
@@ -423,7 +427,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
                         }
 
-                    }
+                    }*/
                 }
 
 
@@ -432,26 +436,26 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
             strings match {
 
-                case _ :: "the" :: tail =>
+                case _ :: tail =>
                 {
                     tail match {
 
-                        case _ :: _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
-                        case _ :: _ :: tail1 => normal_value(tail1)
+                        case "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
+                        case tail1 => normal_value(tail1)
 
                     }
                 }
-
+/*
                 case _ :: tail =>
                 {
                     tail match {
 
                         case _ :: "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
-                        case _ :: tail1 => normal_value(tail1)
+                        case tail1 => normal_value(tail1)
 
                     }
 
-                }
+                }*/
             }
 
         }
