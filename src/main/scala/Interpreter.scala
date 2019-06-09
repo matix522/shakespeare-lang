@@ -91,6 +91,10 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
         math.sqrt(a).toInt
     }
 
+    def cube(i: Int): Int = {
+        i*i*i
+    }
+
     def calculateValue(v: Value): Int = v match {
         case PositiveNoun(_) => 1
         case NegativeNoun(_) => -1
@@ -107,6 +111,8 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
 
         case Square(a: Value) => sqr(calculateValue(a))
         case SquareRoot(a: Value) => sqrt(calculateValue(a))
+
+        case Cube(a: Value) => cube(calculateValue(a))
 
         case SpecifiedCharacterValue(character : Character) => {
             if (stage.isOnStage(character)) {

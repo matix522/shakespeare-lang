@@ -210,6 +210,92 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     }
 
+    def difference(strings: Array[String], j: Int): Value = {
+
+        var i = j
+
+
+
+
+    }
+
+    def sum(strings: Array[String], j: Int): Value = {
+        var i = j
+
+
+    }
+
+    def product(strings: Array[String], j: Int): Value = {
+
+        var i = j
+
+    }
+
+    def quotient(strings: Array[String], j: Int): Value = {
+        var i = j
+
+
+
+    }
+
+    def square(strings: Array[String], j: Int): Value = {
+
+        var i = j
+
+
+    }
+
+    def square_root(strings: Array[String], j: Int): Value = {
+        var i = j
+
+
+    }
+
+    def cube(strings: Array[String], j: Int): Value =
+    {
+        var i = j
+
+
+    }
+
+    def twice(strings: Array[String], j: Int): Value =
+    {
+        val i = j
+
+        Product(JustValue(2),choose_operation(strings,i))
+    }
+
+    def choose_operation(strings: Array[String], j: Int): Value =
+    {
+        var i = j
+
+        if (strings(i) == "the") i+=1
+        //throw new IllegalArgumentException("Expected the after as * as")
+
+        strings(i) match {
+
+            case "difference" => difference(strings,i+2)
+            case "sum" => sum(strings,i+2)
+            case "product" =>  product(strings,i+2)
+            case "quotient" =>  quotient(strings,i+2)
+            case "remainder" => quotient(strings,i+5)
+            case "square" =>{
+                i+=1
+                strings(i) match {
+                    case "of" => square(strings, i+1)
+                    case "root" => square_root(strings,i+2)
+                    case _ => throw new IllegalArgumentException(s"Unexpected word after square")
+                }
+            }
+            case "cube" => cube(strings,i+2)
+            case "twice" => twice(strings,i+1)
+            case _ =>  normal_value(strings,i)
+        }
+
+
+    }
+
+
     def get_value(strings: Array[String]) : Value = {
 
        //return JustValue(70)
@@ -231,32 +317,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         }
 
         i+=3
-
-        if (strings(i) == "the") i+=1
-            //throw new IllegalArgumentException("Expected the after as * as")
-
-        strings(i) match {
-
-            case "difference" =>
-            case "sum" =>
-            case "product" =>
-            case "quotient" =>
-            case "remainder" =>
-            case "square" =>{
-                i+=1
-                strings(i) match {
-                    case "of" =>
-                    case "root" =>
-                    case _ => throw new IllegalArgumentException(s"Unexpected word after square")
-                }
-            }
-            case "cube" =>
-            case "twice" =>
-            case _ => throw new IllegalArgumentException("Error!")
-        }
+        return choose_operation(strings,i)
 
 
-        return JustValue(60)
 
     }
 
