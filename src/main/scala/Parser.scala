@@ -173,12 +173,39 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
 
+    def normal_value(strings: Array[String], i: Int): Int = {
+
+
+
+
+
+        return 0
+
+    }
+
     def get_value(strings: Array[String]) : Value = {
 
-        PositiveNoun(true)
+       return JustValue(70)
+/*
+        var i = 1
+
+        val be = strings(i)
+
+        if (!dictionary.be.contains(be)){
+            throw new IllegalArgumentException(s"Error! $be is not a correct \"be\" word")
+        }
+
+        i +=1
+
+        if (strings(i) != "as"){
+
+            return JustValue(normal_value(strings,i))
+        }
 
 
 
+
+*/
 
 
 

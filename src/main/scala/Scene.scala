@@ -28,6 +28,8 @@ case class NegativeNoun(speaker : Boolean) extends Value
 case class NeutralNoun(speaker : Boolean) extends Value
 case class Adjective(value: Value) extends Value
 
+case class JustValue(value: Int) extends Value
+
 case class Sum(a: Value, b: Value) extends Value
 case class Difference(a: Value, b: Value) extends Value
 case class Product(a: Value, b: Value) extends Value

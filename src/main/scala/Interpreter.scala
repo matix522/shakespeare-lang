@@ -97,6 +97,8 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
         case NeutralNoun(_) => 1
         case Adjective(value: Value) => 2 * calculateValue(value)
 
+        case JustValue(value: Int) => value
+
         case Sum(a: Value, b: Value) => calculateValue(a) + calculateValue(b)
         case Difference(a: Value, b: Value) => calculateValue(a) - calculateValue(b)
         case Product(a: Value, b: Value) => calculateValue(a) * calculateValue(b)
