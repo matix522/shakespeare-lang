@@ -47,8 +47,6 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
 
     def doExpressions(expressions: List[Expression]): Int = {
 
-
-
         for (expr <- expressions) {
             //println(expr)
 //            println(stage.speaker)
@@ -58,7 +56,7 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
                 case Assigment(speaker : Boolean, value: Value) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = calculateValue(value)
 
                 case PrintInt(speaker : Boolean) => print(getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value)
-                case LoadInt(speaker : Boolean) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = Console.in.read.toChar.asInstanceOf[Int]
+                case LoadInt(speaker : Boolean) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = scala.io.StdIn.readLine().toInt
                 case PrintChar(speaker : Boolean) => print(getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value.asInstanceOf[Char])
                 case LoadChar(speaker : Boolean) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = Console.in.read.toChar
 

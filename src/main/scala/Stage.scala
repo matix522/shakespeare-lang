@@ -19,18 +19,33 @@ class Stage {
         //println(speaker)
         //println(listener)
 
-        speaker match {
-            case Some(`character`) =>
-                speaker = None
+        if (speaker.get.name == character.name){
 
-            case _ =>
-        }
-        listener match {
-            case Some(`character`) =>
-                listener = None
+            speaker = None
+            return
 
-            case _ => throw new RuntimeException(s"There is no $character on the scene.")
+
         }
+
+        if (listener.get.name == character.name){
+
+            listener = None
+            return
+
+        }
+
+//        speaker match {
+//            case Some(`character`) =>
+//                speaker = None
+//
+//            case _ =>
+//        }
+//        listener match {
+//            case Some(`character`) =>
+//                listener = None
+//
+//            case _ => throw new RuntimeException(s"There is no $character on the scene.")
+//        }
 
     }
 

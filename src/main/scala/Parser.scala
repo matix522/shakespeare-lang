@@ -25,6 +25,8 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 //        for (i <- charactersMap)
 //            println(i._1)
 
+
+
         val interpreter = new Interpreter(charactersMap,acts)
 
         interpreter.execute()
@@ -72,12 +74,23 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 case _ => throw new IllegalArgumentException(s"Incorect [Enter/Exit] block $regMatch")
             }
 
+
             //println(dialogs(i))
-            sceneParts.addAll(parse_statements(dialogs(i)))
+            if (i < dialogs.length)
+                sceneParts.addAll(parse_statements(dialogs(i)))
 
             i += 1
             sceneParts.addOne(enterExitBlock)
+
         }
+
+        while (i < dialogs.length)
+            {
+
+                sceneParts.addAll(parse_statements(dialogs(i)))
+                i+=1
+            }
+
         (id, new Scene(id, sceneParts.toList))
     }
 
