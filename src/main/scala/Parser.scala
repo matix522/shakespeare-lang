@@ -214,12 +214,12 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     }
 
-    def difference(strings: List[String]): Value = {
+    def find_split(strings: List[String]): Int = {
 
         var deep = 1
         var i = 0
 
-        var add_deep = Set("difference","sum","product",
+        val add_deep = Set("difference","sum","product",
             "quotient","remainder")
 
         while ( i < strings.length && deep > 0)
@@ -240,105 +240,31 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             throw new IllegalArgumentException("Some error")
 
         i -=1
+        i
 
-        //znajdz miejsce, gdzie jest and od aktualnej operacji
-        // podziel na strings :: "and" :: tail
+    }
+
+    def difference(strings: List[String]): Value = {
+
+        val i = find_split(strings)
 
         Difference(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
     }
 
     def sum(strings: List[String]): Value = {
-        var deep = 1
-        var i = 0
-
-        var add_deep = Set("difference","sum","product",
-            "quotient","remainder")
-
-        while ( i < strings.length && deep > 0)
-        {
-            if (strings(i) == "and")
-            {
-                deep -=1
-            }
-
-            if (add_deep.contains(strings(i)))
-                deep+=1
-
-            i+=1
-
-        }
-
-        if ( deep != 0)
-            throw new IllegalArgumentException("Some error")
-
-        i -=1
-
-        //znajdz miejsce, gdzie jest and od aktualnej operacji
-        // podziel na strings :: "and" :: tail
+        val i = find_split(strings)
 
         Sum(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
     }
 
     def product(strings: List[String]): Value = {
-        var deep = 1
-        var i = 0
-
-        var add_deep = Set("difference","sum","product",
-            "quotient","remainder")
-
-        while ( i < strings.length && deep > 0)
-        {
-            if (strings(i) == "and")
-            {
-                deep -=1
-            }
-
-            if (add_deep.contains(strings(i)))
-                deep+=1
-
-            i+=1
-
-        }
-
-        if ( deep != 0)
-            throw new IllegalArgumentException("Some error")
-
-        i -=1
-
-        //znajdz miejsce, gdzie jest and od aktualnej operacji
-        // podziel na strings :: "and" :: tail
+        val i = find_split(strings)
 
     Product(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
     }
 
     def quotient(strings: List[String]): Value = {
-        var deep = 1
-        var i = 0
-
-        var add_deep = Set("difference","sum","product",
-            "quotient","remainder")
-
-        while ( i < strings.length && deep > 0)
-        {
-            if (strings(i) == "and")
-            {
-                deep -=1
-            }
-
-            if (add_deep.contains(strings(i)))
-                deep+=1
-
-            i+=1
-
-        }
-
-        if ( deep != 0)
-            throw new IllegalArgumentException("Some error")
-
-        i -=1
-
-        //znajdz miejsce, gdzie jest and od aktualnej operacji
-        // podziel na strings :: "and" :: tail
+        val i = find_split(strings)
 
         Quotient(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
     }
@@ -369,33 +295,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     def remainder(strings: List[String]): Value = {
 
-        var deep = 1
-        var i = 0
-
-        var add_deep = Set("difference","sum","product",
-            "quotient","remainder")
-
-        while ( i < strings.length && deep > 0)
-        {
-            if (strings(i) == "and")
-            {
-                deep -=1
-            }
-
-            if (add_deep.contains(strings(i)))
-                deep+=1
-
-            i+=1
-
-        }
-
-        if ( deep != 0)
-            throw new IllegalArgumentException("Some error")
-
-        i -=1
-
-        //znajdz miejsce, gdzie jest and od aktualnej operacji
-        // podziel na strings :: "and" :: tail
+        val i = find_split(strings)
 
         Remainder(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
     }
