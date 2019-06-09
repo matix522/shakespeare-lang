@@ -40,7 +40,7 @@ case class Square(a: Value) extends Value
 case class SquareRoot(a: Value) extends Value
 
 case class CharacterValue(speaker : Boolean) extends Value
-case class SpecifiedCharacterValue(character: Character) extends Value
+case class SpecifiedCharacterValue(character: String) extends Value
 
 case class Assigment(speaker : Boolean, value: Value) extends Expression
 

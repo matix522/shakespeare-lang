@@ -108,18 +108,15 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
         case Square(a: Value) => sqr(calculateValue(a))
         case SquareRoot(a: Value) => sqrt(calculateValue(a))
 
-        case SpecifiedCharacterValue(character : Character) => {
-            if (stage.isOnStage(character)) {
-                characters(character).value
-            }
-            else throw new RuntimeException(s"There is no requested character on the scene.")
+        case SpecifiedCharacterValue(character : String) => characters(character).value
 
-        }
 
         case CharacterValue(speaker : Boolean) =>
-            if (stage.isOnStage(characters(if (speaker) stage.speaker.get.name else stage.listener.get.name ))) {
-                characters(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value
-            }
+            if (stage.speaker.nonEmpty && speaker)
+                stage.speaker.get.value
+            else if (stage.listener.nonEmpty && !speaker)
+                stage.listener.get.value
+
             else throw new RuntimeException(s"There is no requested character on the scene.")
     }
 }
