@@ -9,11 +9,11 @@ object Main {
 
     def main(args: Array[String]): Unit = {
 
-        var dictionary = new Dictionary;
+        val dictionary = new Dictionary;
 
         val sourceCode = loadFile(args(0))
 
-        var parser = new Parser(sourceCode, dictionary)
+        val parser = new Parser(sourceCode, dictionary)
         parser.parse()
     }
 }
