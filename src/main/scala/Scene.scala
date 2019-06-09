@@ -53,15 +53,16 @@ case class LoadChar(speaker : Boolean) extends Expression
 case class GotoS(scene: Int) extends Expression //TODO LOW PRIO
 case class GotoA(act: Int) extends Expression //TODO LOW PRIO
 
-case class Push(destCharacter: String, src: Value) extends Expression  //TODO LOW PRIO
-case class Pop(destCharacter: String) extends Expression  //TODO LOW PRIO
+case class Push(speaker: Boolean) extends Expression  //TODO LOW PRIO
+case class Pop() extends Expression  //TODO LOW PRIO
 
 case class Equal(a: Value, b: Value) extends Condition
 case class Less(a: Value, b: Value) extends Condition
 case class More(a: Value, b: Value) extends Condition
 case class Not(c: Condition) extends Condition
 
-case class ConditionalBlock(condition: Condition, expression: Expression) extends Expression
+case class ConditionalBlock(condition: Condition) extends Expression
+case class Then(if_not : Boolean, expression: Expression) extends Expression
 
 class Scene(val id: Int, val sceneParts: List[ScenePart]) {
 

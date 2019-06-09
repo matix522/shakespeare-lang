@@ -21,6 +21,11 @@ object Operation {
         value
     }
 
+    def normal_value(a: String): Value = {
+
+        return JustValue(0)
+    }
+
     def parseOperation(atoms: List[String]): (Value, List[String]) = {
         atoms match {
             case "difference between" :: tail =>
@@ -58,4 +63,6 @@ object Operation {
             case a :: tail => (normal_value(a), tail)
         }
     }
+
+
 }

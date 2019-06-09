@@ -24,6 +24,7 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
 
     def doScene(scene: Scene): Int = {
         for (scenePart <- scene.sceneParts) {
+            println(scenePart)
             scenePart match {
                 case Enter(first, None) => stage.enter(characters(first))
                 case Enter(first, second) => stage.enter(characters(first), characters(second.get))
@@ -42,7 +43,12 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
     }
 
     def doExpressions(expressions: List[Expression]): Int = {
+
+        var was_condition = false
+        var condition_was = false
+
         for (expr <- expressions) {
+           // println(expr)
             expr match {
 
                 case Assigment(speaker : Boolean, value: Value) => getCharacter(if (speaker) stage.speaker.get.name else stage.listener.get.name ).value = calculateValue(value)
@@ -58,17 +64,43 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
                     actNumber = act - 1
                     return -1
 
-                case Push(destCharacter: String, src: Value) =>
-                    getCharacter(destCharacter).stack.push(calculateValue(src))
-                case Pop(destCharacter: String) =>
-                    val c = getCharacter(destCharacter)
+                case Push(speaker : Boolean) =>
+                    getCharacter(if (speaker) stage.getSpeaker.name else stage.getListener.name)
+                      .stack.push(if (speaker) stage.getSpeaker.value else stage.getListener.value)
+                case Pop() =>
+                    val c = getCharacter(stage.getListener.name)
                     c.value = c.stack.pop()
 
 
-                case ConditionalBlock(condition: Condition, expression: Expression) =>
-                    if (checkCondition(condition)) {
-                        expression
+                case Then(if_not : Boolean, expression : Expression) =>
+                {
+                    if (if_not) {
+
+                        if (!condition_was){
+                            val ret =  doExpressions(List(expression))
+                            return ret
+                        }
+
                     }
+                    else if (!if_not)
+                        {
+                            if (condition_was)
+                                {
+                                    val ret =  doExpressions(List(expression))
+                                    return ret
+                                }
+
+                        }
+                }
+
+
+                case ConditionalBlock(condition: Condition) =>
+                    was_condition = true
+                    if (checkCondition(condition)) {
+                        condition_was = true
+                    }
+                    else condition_was = false
+
             }
         }
         0
@@ -79,7 +111,7 @@ class Interpreter(var characters: Map[String, Character], val acts: Map[Int, Act
             case Equal(a: Value, b: Value) => calculateValue(a) == calculateValue(b)
             case Less(a: Value, b: Value) => calculateValue(a) < calculateValue(b)
             case More(a: Value, b: Value) => calculateValue(a) > calculateValue(b)
-            case Not(c: Condition) => checkCondition(c)
+            case Not(c: Condition) => !checkCondition(c)
         }
     }
 

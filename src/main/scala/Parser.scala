@@ -38,7 +38,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
     def parseAct(actCode: String): (Int, Act) = {
-        val id = RomanToInt(actCode.split(":")(0).trim())
+        val id = RomanToInt(actCode.split(":")(0).trim().toLowerCase)
 
         val scenesCode = actCode.split("Scene ").toList
 
@@ -51,7 +51,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
     }
 
     def parseScene(sceneCode: String): (Int, Scene) = {
-        val id = RomanToInt(sceneCode.split(":")(0).trim())
+        val id = RomanToInt(sceneCode.split(":")(0).trim().toLowerCase)
         val sentences = sceneCode.split("\\.")
         val code = sentences.slice(1, sentences.length).mkString(".")
 
@@ -72,6 +72,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 case _ => throw new IllegalArgumentException(s"Incorect [Enter/Exit] block $regMatch")
             }
 
+            println(dialogs(i))
             sceneParts.addAll(parse_statements(dialogs(i)))
 
             i += 1
@@ -117,6 +118,107 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             val printInt = "(open) (.*) (heart)".r.findFirstMatchIn(s)
             val printChar = "(speak) (.*) (.)".r.findFirstMatchIn(s)
 
+
+            val loadChar = "(open) (.*) (mind)".r.findFirstMatchIn(s)
+            val loadInt = "(listen to) (.*) (heart)".r.findFirstMatchIn(s)
+
+            val goto = Set("let us","we shall","we must")
+
+            val pop = "(recall) (.*)".r.findFirstMatchIn(s)
+
+            val push = "(remember) (.*)".r.findFirstMatchIn(s)
+
+            val if_so = "(if so,) (.*)".r.findFirstMatchIn(s)
+
+            val if_not = "(if not,) (.*)".r.findFirstMatchIn(s)
+
+            //println(s)
+
+            val s_split = s.split(" ")
+
+            //println(s_split.slice(0,2).mkString(" "))
+
+            if (goto.contains(s_split.slice(0,2).mkString(" ")))
+            {
+                //println("3############")
+                if ( 5 <= s_split.length )
+
+                    if (s_split(4) == "scene")
+                        ret.addOne(GotoS(RomanToInt(s_split(5))))
+
+                    else ret.addOne(GotoA(RomanToInt(s_split(5))))
+
+                else
+                    ret.addOne(GotoS(1))
+            }
+
+            else if (dictionary.be.contains(s_split(0))){
+
+                val a = s_split.slice(1,s_split.length).mkString(" ")
+
+                val equal_regex = "(.*) (as) (.*) (as) (.*)".r.findFirstMatchIn(a)
+
+                val more_regex = "(.*) (better than) (.*)".r.findFirstMatchIn(a)
+
+                val less_regex = "(.*) (worse than) (.*)".r.findFirstMatchIn(a)
+
+                if (equal_regex.nonEmpty) {
+
+                    ret.addOne(ConditionalBlock(Equal(choose_operation(equal_regex.get.group(1).split(" ").toList)
+                        ,choose_operation(equal_regex.get.group(5).split(" ").toList))))
+                }
+
+                if (more_regex.nonEmpty) {
+
+                    ret.addOne(ConditionalBlock(More(choose_operation(more_regex.get.group(1).split(" ").toList)
+                        ,choose_operation(more_regex.get.group(3).split(" ").toList))))
+
+                }
+
+                if (less_regex.nonEmpty) {
+
+                    ret.addOne(ConditionalBlock(Less(choose_operation(less_regex.get.group(1).split(" ").toList)
+                        ,choose_operation(less_regex.get.group(3).split(" ").toList))))
+
+                }
+
+            }
+            else if (if_so.nonEmpty) {
+
+                val eval =  if_so.get.group(2).toLowerCase
+
+                val s = parse_sentences(eval)
+
+                ret.addOne(Then(if_not = false,s.expressions.head))
+
+            }
+            else if (if_not.nonEmpty) {
+
+                val eval =  if_not.get.group(2).toLowerCase
+
+                val s = parse_sentences(eval)
+
+                ret.addOne(Then(if_not = true,s.expressions.head))
+
+            }
+
+            else if (pop.nonEmpty){
+
+                ret.addOne(Pop())
+            }
+            else if (push.nonEmpty) {
+
+                val possessive =  push.get.group(2).toLowerCase
+
+                if (dictionary.first_person_possessive.contains(possessive))
+                    ret.addOne(Push(true))
+                else if (dictionary.second_person_possessive.contains(possessive))
+                    ret.addOne(Push(false))
+                else throw new IllegalArgumentException(s"Error, $possessive is not a correct possesive word ")
+
+            }
+
+            else
             if (printInt.nonEmpty) {
 
                 val possessive =  printInt.get.group(2).toLowerCase
@@ -138,6 +240,29 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 else if (dictionary.second_person_possessive.contains(possessive))
                     ret.addOne(PrintChar(false))
                 else throw new IllegalArgumentException(s"Error, $possessive is not a correct possessive word ")
+            }
+            else if (loadChar.nonEmpty){
+
+                val possessive =  loadChar.get.group(2).toLowerCase
+
+                if (dictionary.first_person_possessive.contains(possessive))
+                    ret.addOne(LoadChar(true))
+                else if (dictionary.second_person_possessive.contains(possessive))
+                    ret.addOne(LoadChar(false))
+                else throw new IllegalArgumentException(s"Error, $possessive is not a correct possesive word ")
+
+            }
+
+            else if (loadInt.nonEmpty) {
+
+                val possessive =  loadInt.get.group(2).toLowerCase
+
+                if (dictionary.first_person_possessive.contains(possessive))
+                    ret.addOne(LoadInt(true))
+                else if (dictionary.second_person_possessive.contains(possessive))
+                    ret.addOne(LoadInt(false))
+                else throw new IllegalArgumentException(s"Error, $possessive is not a correct possesive word ")
+
             }
             else {
 
@@ -177,6 +302,12 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         if (dictionary.character.contains(word))
             return SpecifiedCharacterValue(word)
+
+        if (dictionary.second_person.contains(word))
+            return CharacterValue(false)
+
+        if (dictionary.first_person.contains(word))
+            return CharacterValue(true)
 
         if (dictionary.first_person_reflexive.contains(word))
             return CharacterValue(true)
@@ -437,13 +568,13 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
 
     def RomanToInt(roman: String): Int = {
-        if (!roman.matches("^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$")) {
+        if (!roman.matches("^m{0,4}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})$")) {
             throw new IllegalArgumentException(s"$roman is not roman numeral")
         }
 
 
-        val roman_numerals_map: Map[Char, Int] = Map('M' -> 1000, 'D' -> 500,
-            'C' -> 100, 'L' -> 50, 'X' -> 10, 'V' -> 5, 'I' -> 1)
+        val roman_numerals_map: Map[Char, Int] = Map('m' -> 1000, 'd' -> 500,
+            'c' -> 100, 'l' -> 50, 'x' -> 10, 'v' -> 5, 'i' -> 1)
 
         var res: Int = 0
 
