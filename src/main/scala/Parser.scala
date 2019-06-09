@@ -232,15 +232,31 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         i+=3
 
+        if (strings(i) == "the") i+=1
+            //throw new IllegalArgumentException("Expected the after as * as")
+
+        strings(i) match {
+
+            case "difference" =>
+            case "sum" =>
+            case "product" =>
+            case "quotient" =>
+            case "remainder" =>
+            case "square" =>{
+                i+=1
+                strings(i) match {
+                    case "of" =>
+                    case "root" =>
+                    case _ => throw new IllegalArgumentException(s"Unexpected word after square")
+                }
+            }
+            case "cube" =>
+            case "twice" =>
+            case _ => throw new IllegalArgumentException("Error!")
+        }
 
 
         return JustValue(60)
-
-
-
-
-
-
 
     }
 
