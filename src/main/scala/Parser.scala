@@ -230,8 +230,11 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             return normal_value(strings,i)
         }
 
+        i+=3
 
-        return JustValue(1)
+
+
+        return JustValue(60)
 
 
 
