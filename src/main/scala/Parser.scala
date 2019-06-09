@@ -115,6 +115,8 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         for (s <- sentences) {
          // println(s)
             val printInt = "(open) (.*) (heart)".r.findFirstMatchIn(s)
+            val printChar = "(speak) (.*) (.)".r.findFirstMatchIn(s)
+
             if (printInt.nonEmpty) {
 
                 val possessive =  printInt.get.group(2).toLowerCase
@@ -127,8 +129,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
 
             }
-            val printChar = "(speak) (.*) (.)".r.findFirstMatchIn(s)
-            if (printChar.nonEmpty) {
+           else if (printChar.nonEmpty) {
 
                 val possessive = printChar.get.group(2).toLowerCase
 
@@ -138,23 +139,27 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                     ret.addOne(PrintChar(false))
                 else throw new IllegalArgumentException(s"Error, $possessive is not a correct possessive word ")
             }
+            else {
 
-            var tokens = s.split(" ")
+                var tokens = s.split(" ")
 
-            var assig = tokens(0)
-            println(assig)
+                var assig = tokens(0)
+                //println(assig)
 
-            if (dictionary.first_person.contains(assig)) {
+                if (dictionary.first_person.contains(assig)) {
 
-                ret.addOne(Assigment(speaker = true,get_value(tokens.toList)))
+                    ret.addOne(Assigment(speaker = true,get_value(tokens.toList)))
+
+                }
+
+                else if (dictionary.second_person.contains(assig)) {
+
+                    ret.addOne(Assigment(speaker = false,get_value(tokens.toList)))
+
+                }
 
             }
 
-            else if (dictionary.second_person.contains(assig)) {
-
-                ret.addOne(Assigment(speaker = false,get_value(tokens.toList)))
-
-            }
 
         }
 
@@ -168,7 +173,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             throw new IllegalArgumentException("Error in sentence")
 
         val word = strings(0)
-        println(word)
+       println(word)
 
         if (dictionary.character.contains(word))
             return SpecifiedCharacterValue(word)
