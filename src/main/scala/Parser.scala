@@ -2,36 +2,31 @@ import scala.collection.mutable.ListBuffer
 
 class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
-    def parse(): Unit = {
+    def parse(debug: Boolean = false): (Map[String, Character], Map[Int, Act]) = {
         val actsCode = sourceCode.split("Act ").toList
         if (actsCode.length < 2) {
             throw new IllegalArgumentException("No acts in source code")
         }
         val charactersList = parseCharacters(actsCode(0))
-        println("Characters:" + charactersList)
 
-        //println(actsCode)
         val acts = actsCode.slice(1, actsCode.size).map(parseAct).toMap
-
-        //println(acts)
-
-        // interpreter testing
-
-//        for (i <- charactersList)
-//            println(i)
+        if (debug) {
+            for (a <- acts) {
+                println("Act " + a._1)
+                for (s <- a._2.scenes) {
+                    println("\tScene " + s._1)
+                    s._2.sceneParts.foreach {
+                        case Sentence(expressions) =>
+                            println("\t\t  Sentence:")
+                            expressions.foreach(e => println("\t\t\t" + e))
+                        case p => println("\t\t" + p)
+                    }
+                }
+            }
+        }
 
         val charactersMap = charactersList.map(a => a.name.toLowerCase.trim -> a).toMap
-//
-//        for (i <- charactersMap)
-//            println(i._1)
-
-
-
-        val interpreter = new Interpreter(charactersMap,acts)
-
-        interpreter.execute()
-
-
+        (charactersMap, acts)
 
     }
 
@@ -84,38 +79,35 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         }
 
-        while (i < dialogs.length)
-            {
+        while (i < dialogs.length) {
 
-                sceneParts.addAll(parse_statements(dialogs(i)))
-                i+=1
-            }
+            sceneParts.addAll(parse_statements(dialogs(i)))
+            i += 1
+        }
 
         (id, new Scene(id, sceneParts.toList))
     }
 
     def parse_statements(s: String): List[ScenePart] = {
         val sentences = s.split("[A-Z,a-z]*:").filter(s => s.length > 0)
-          .map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim)
-          .toList
+            .map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim)
+            .toList
 
 
         val characters = "[A-Z,a-z]*:".r
-          .findAllMatchIn(s)
-          .map(m => m.group(0).replace(":", "")).map(a => a.toLowerCase.trim)
-          .map(s => {
-              if (!dictionary.character.contains(s)) throw new IllegalArgumentException(s"ERROR! Character $s is not an Shakespeare character!")
-              s
-          })
-          .toList
+            .findAllMatchIn(s)
+            .map(m => m.group(0).replace(":", "")).map(a => a.toLowerCase.trim)
+            .map(s => {
+                if (!dictionary.character.contains(s)) throw new IllegalArgumentException(s"ERROR! Character $s is not an Shakespeare character!")
+                s
+            })
+            .toList
 
         val ret = new ListBuffer[ScenePart]
         for ((c, s) <- characters.map(s => Speaker(s)).zip(sentences.map(s => parse_sentences(s.replace("\r\n", " "))))) {
             ret.addOne(c)
             ret.addOne(s)
         }
-        //        println(characters)
-        //        print(s)
         ret.toList
     }
 
@@ -123,11 +115,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         val ret = new ListBuffer[Expression]
 
-     // println(str)
 
         val sentences = str.split("\\.|!|\\?").map(a => a.replaceAll("\n", " ")).map(a => a.toLowerCase).map(a => a.trim).toList
         for (s <- sentences) {
-         // println(s)
             val printInt = "(open) (.*) (heart)".r.findFirstMatchIn(s)
             val printChar = "(speak) (.*) (.)".r.findFirstMatchIn(s)
 
@@ -135,7 +125,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             val loadChar = "(open) (.*) (mind)".r.findFirstMatchIn(s)
             val loadInt = "(listen to) (.*) (heart)".r.findFirstMatchIn(s)
 
-            val goto = Set("let us","we shall","we must")
+            val goto = Set("let us", "we shall", "we must")
 
             val pop = "(recall) (.*)".r.findFirstMatchIn(s)
 
@@ -145,16 +135,10 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
             val if_not = "(if not,) (.*)".r.findFirstMatchIn(s)
 
-            //println(s)
-
             val s_split = s.split(" ")
 
-           // println(s_split.slice(0,2).mkString(" "))
-
-            if (goto.contains(s_split.slice(0,2).mkString(" ")))
-            {
-                //println("3############")
-                if ( 5 <= s_split.length )
+            if (goto.contains(s_split.slice(0, 2).mkString(" "))) {
+                if (5 <= s_split.length)
 
                     if (s_split(4) == "scene")
                         ret.addOne(GotoS(RomanToInt(s_split(5))))
@@ -165,9 +149,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                     ret.addOne(GotoS(1))
             }
 
-            else if (dictionary.be.contains(s_split(0))){
+            else if (dictionary.be.contains(s_split(0))) {
 
-                val a = s_split.slice(1,s_split.length).mkString(" ")
+                val a = s_split.slice(1, s_split.length).mkString(" ")
 
                 val equal_regex = "(.*) (as) (.*) (as) (.*)".r.findFirstMatchIn(a)
 
@@ -178,55 +162,50 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 if (equal_regex.nonEmpty) {
 
                     ret.addOne(ConditionalBlock(Equal(choose_operation(equal_regex.get.group(1).split(" ").toList)
-                        ,choose_operation(equal_regex.get.group(5).split(" ").toList))))
+                        , choose_operation(equal_regex.get.group(5).split(" ").toList))))
                 }
 
                 if (more_regex.nonEmpty) {
 
                     ret.addOne(ConditionalBlock(More(choose_operation(more_regex.get.group(1).split(" ").toList)
-                        ,choose_operation(more_regex.get.group(3).split(" ").toList))))
+                        , choose_operation(more_regex.get.group(3).split(" ").toList))))
 
                 }
 
                 if (less_regex.nonEmpty) {
 
                     ret.addOne(ConditionalBlock(Less(choose_operation(less_regex.get.group(1).split(" ").toList)
-                        ,choose_operation(less_regex.get.group(3).split(" ").toList))))
+                        , choose_operation(less_regex.get.group(3).split(" ").toList))))
 
                 }
 
             }
             else if (if_so.nonEmpty) {
 
-                val eval =  if_so.get.group(2).toLowerCase
-
-                //println(eval)
+                val eval = if_so.get.group(2).toLowerCase
 
                 val s = parse_sentences(eval)
 
-                ret.addOne(Then(if_not = false,s.expressions.head))
+                ret.addOne(Then(if_not = false, s.expressions.head))
 
             }
             else if (if_not.nonEmpty) {
 
-                val eval =  if_not.get.group(2).toLowerCase
-
-                //println(eval)
-
+                val eval = if_not.get.group(2).toLowerCase
 
                 val s = parse_sentences(eval)
 
-                ret.addOne(Then(if_not = true,s.expressions.head))
+                ret.addOne(Then(if_not = true, s.expressions.head))
 
             }
 
-            else if (pop.nonEmpty){
+            else if (pop.nonEmpty) {
 
                 ret.addOne(Pop())
             }
             else if (push.nonEmpty) {
 
-                val possessive =  push.get.group(2).toLowerCase
+                val possessive = push.get.group(2).toLowerCase
 
                 if (dictionary.first_person_reflexive.contains(possessive))
                     ret.addOne(Push(true))
@@ -236,10 +215,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
             }
 
-            else
-            if (printInt.nonEmpty) {
+            else if (printInt.nonEmpty) {
 
-                val possessive =  printInt.get.group(2).toLowerCase
+                val possessive = printInt.get.group(2).toLowerCase
 
                 if (dictionary.first_person_possessive.contains(possessive))
                     ret.addOne(PrintInt(true))
@@ -249,7 +227,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
 
             }
-           else if (printChar.nonEmpty) {
+            else if (printChar.nonEmpty) {
 
                 val possessive = printChar.get.group(2).toLowerCase
 
@@ -259,9 +237,9 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                     ret.addOne(PrintChar(false))
                 else throw new IllegalArgumentException(s"Error, $possessive is not a correct possessive word ")
             }
-            else if (loadChar.nonEmpty){
+            else if (loadChar.nonEmpty) {
 
-                val possessive =  loadChar.get.group(2).toLowerCase
+                val possessive = loadChar.get.group(2).toLowerCase
 
                 if (dictionary.first_person_possessive.contains(possessive))
                     ret.addOne(LoadChar(true))
@@ -273,7 +251,7 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
             else if (loadInt.nonEmpty) {
 
-                val possessive =  loadInt.get.group(2).toLowerCase
+                val possessive = loadInt.get.group(2).toLowerCase
 
                 if (dictionary.first_person_possessive.contains(possessive))
                     ret.addOne(LoadInt(true))
@@ -287,17 +265,16 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
                 val tokens = s.split(" ")
 
                 val assig = tokens(0)
-                //println(assig)
 
                 if (dictionary.first_person.contains(assig)) {
 
-                    ret.addOne(Assigment(speaker = true,get_value(tokens.toList)))
+                    ret.addOne(Assigment(speaker = true, get_value(tokens.toList)))
 
                 }
 
                 else if (dictionary.second_person.contains(assig)) {
 
-                    ret.addOne(Assigment(speaker = false,get_value(tokens.toList)))
+                    ret.addOne(Assigment(speaker = false, get_value(tokens.toList)))
 
                 }
 
@@ -316,7 +293,6 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
             throw new IllegalArgumentException("Error in sentence")
 
         val word = strings(0)
-       //println(word)
 
         if (dictionary.character.contains(word))
             return SpecifiedCharacterValue(word)
@@ -335,16 +311,16 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         // a an or the or my, mine, yours....
         if (dictionary.article.contains(word)
-        || dictionary.first_person_possessive.contains(word)
-        || dictionary.second_person_possessive.contains(word)
-        || dictionary.third_person_possessive.contains(word)){
-            return normal_value(strings.slice(1,strings.length))
+            || dictionary.first_person_possessive.contains(word)
+            || dictionary.second_person_possessive.contains(word)
+            || dictionary.third_person_possessive.contains(word)) {
+            return normal_value(strings.slice(1, strings.length))
         }
 
         if (dictionary.negative_adjective.contains(word) ||
-             dictionary.neutral_adjective.contains(word) ||
+            dictionary.neutral_adjective.contains(word) ||
             dictionary.positive_adjective.contains(word))
-                return Adjective(normal_value(strings.slice(1,strings.length)))
+            return Adjective(normal_value(strings.slice(1, strings.length)))
 
         if (dictionary.negative_noun.contains(word))
             return NegativeNoun(true)
@@ -368,27 +344,25 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         var deep = 1
         var i = 0
 
-        val add_deep = Set("difference","sum","product",
-            "quotient","remainder")
+        val add_deep = Set("difference", "sum", "product",
+            "quotient", "remainder")
 
-        while ( i < strings.length && deep > 0)
-        {
-            if (strings(i) == "and")
-            {
-                deep -=1
+        while (i < strings.length && deep > 0) {
+            if (strings(i) == "and") {
+                deep -= 1
             }
 
             if (add_deep.contains(strings(i)))
-                deep+=1
+                deep += 1
 
-            i+=1
+            i += 1
 
         }
 
-        if ( deep != 0)
+        if (deep != 0)
             throw new IllegalArgumentException("Some error")
 
-        i -=1
+        i -= 1
         i
 
     }
@@ -397,25 +371,25 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
         val i = find_split(strings)
 
-        Difference(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
+        Difference(choose_operation(strings.slice(0, i)), choose_operation(strings.slice(i + 1, strings.length)))
     }
 
     def sum(strings: List[String]): Value = {
         val i = find_split(strings)
 
-        Sum(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
+        Sum(choose_operation(strings.slice(0, i)), choose_operation(strings.slice(i + 1, strings.length)))
     }
 
     def product(strings: List[String]): Value = {
         val i = find_split(strings)
 
-    Product(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
+        Product(choose_operation(strings.slice(0, i)), choose_operation(strings.slice(i + 1, strings.length)))
     }
 
     def quotient(strings: List[String]): Value = {
         val i = find_split(strings)
 
-        Quotient(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
+        Quotient(choose_operation(strings.slice(0, i)), choose_operation(strings.slice(i + 1, strings.length)))
     }
 
     def square(strings: List[String]): Value = {
@@ -429,157 +403,87 @@ class Parser(val sourceCode: String, val dictionary: Dictionary) {
         SquareRoot(choose_operation(strings))
     }
 
-    def cube(strings: List[String]): Value =
-    {
+    def cube(strings: List[String]): Value = {
 
         Cube(choose_operation(strings))
 
     }
 
-    def twice(strings: List[String]): Value =
-    {
+    def twice(strings: List[String]): Value = {
 
-        Product(JustValue(2),choose_operation(strings))
+        Product(JustValue(2), choose_operation(strings))
     }
 
     def remainder(strings: List[String]): Value = {
 
         val i = find_split(strings)
 
-        Remainder(choose_operation(strings.slice(0,i)),choose_operation(strings.slice(i+1,strings.length)))
+        Remainder(choose_operation(strings.slice(0, i)), choose_operation(strings.slice(i + 1, strings.length)))
     }
 
 
-    def choose_operation(strings: List[String]): Value =
-    {
+    def choose_operation(strings: List[String]): Value = {
 
         strings match {
 
             case "the" :: tail =>
-            tail match {
+                tail match {
 
-                case "difference" :: "between" :: tail1 => difference(tail1)
-                case "sum" :: "of" :: tail1 => sum(tail1)
-                case "product" :: "of" :: tail1 =>  product(tail1)
-                case "quotient" :: "between" :: tail1 =>  quotient(tail1)
-                case "remainder" :: "of" :: "the" :: "quotient" :: "between" :: tail1 => remainder(tail1)
-                case "square" :: "of" :: tail1 => square(tail1)
-                case "square" :: "root" :: "of" :: tail1 => square_root(tail1)
-                case "cube" :: "of" :: tail1 => cube(tail1)
-                case "twice" :: tail1 => twice(tail1)
-                case tail1 =>  normal_value(tail1)
-            }
+                    case "difference" :: "between" :: tail1 => difference(tail1)
+                    case "sum" :: "of" :: tail1 => sum(tail1)
+                    case "product" :: "of" :: tail1 => product(tail1)
+                    case "quotient" :: "between" :: tail1 => quotient(tail1)
+                    case "remainder" :: "of" :: "the" :: "quotient" :: "between" :: tail1 => remainder(tail1)
+                    case "square" :: "of" :: tail1 => square(tail1)
+                    case "square" :: "root" :: "of" :: tail1 => square_root(tail1)
+                    case "cube" :: "of" :: tail1 => cube(tail1)
+                    case "twice" :: tail1 => twice(tail1)
+                    case tail1 => normal_value(tail1)
+                }
 
             case tail =>
-            tail match {
+                tail match {
 
-                case "difference" :: "between" :: tail1 => difference(tail1)
-                case "sum" :: "of" :: tail1 => sum(tail1)
-                case "product" :: "of" :: tail1 =>  product(tail1)
-                case "quotient" :: "between" :: tail1 =>  quotient(tail1)
-                case "remainder" :: "of" :: "the" :: "quotient" :: "between" :: tail1 => remainder(tail1)
-                case "square" :: "of" :: tail1 => square(tail1)
-                case "square" :: "root" :: "of" :: tail1 => square_root(tail1)
-                case "cube" :: "of" :: tail1 => cube(tail1)
-                case "twice" :: tail1 => twice(tail1)
-                case tail1 =>  normal_value(tail1)
-            }
+                    case "difference" :: "between" :: tail1 => difference(tail1)
+                    case "sum" :: "of" :: tail1 => sum(tail1)
+                    case "product" :: "of" :: tail1 => product(tail1)
+                    case "quotient" :: "between" :: tail1 => quotient(tail1)
+                    case "remainder" :: "of" :: "the" :: "quotient" :: "between" :: tail1 => remainder(tail1)
+                    case "square" :: "of" :: tail1 => square(tail1)
+                    case "square" :: "root" :: "of" :: tail1 => square_root(tail1)
+                    case "cube" :: "of" :: tail1 => cube(tail1)
+                    case "twice" :: tail1 => twice(tail1)
+                    case tail1 => normal_value(tail1)
+                }
 
         }
 
     }
 
-/*
-    def choose_operation(words: List[String]): Value = {
-        val line = words.mkString(" ")
-
-        words match {
-            case "the" :: "difference" :: "between" :: tail =>
-                val regex = "(the difference between )(.*) and (.*)".r
-                val regMatch = regex.findFirstMatchIn(line).get
-
-                 Difference(
-                    choose_operation(regMatch.group(2).split(" ").toList),
-                    choose_operation(regMatch.group(3).split(" ").toList))
-            case "the" :: "sum" :: "of" :: tail =>
-                val regex = "(the sum of )(.*) and (.*)".r
-                val regMatch = regex.findFirstMatchIn(line).get
-                 Sum(
-                    choose_operation(regMatch.group(2).split(" ").toList),
-                    choose_operation(regMatch.group(3).split(" ").toList))
-            case "the" :: "product" :: "of" :: tail =>
-                val regex = "(the product of )(.*) and (.*)".r
-                val regMatch = regex.findFirstMatchIn(line).get
-
-                 Product(
-                    choose_operation(regMatch.group(2).split(" ").toList),
-                    choose_operation(regMatch.group(3).split(" ").toList))
-
-            case "the" :: "cube" :: "of" :: tail =>
-                val regex = "(the cube of )(.*)".r
-                val regMatch = regex.findFirstMatchIn(line).get
-                 Cube(
-                    choose_operation(regMatch.group(2).split(" ").toList))
-
-            case "twice" :: tail =>
-                val regex = "(twice )(.*)".r
-                val regMatch = regex.findFirstMatchIn(line).get
-                 Product(
-                    choose_operation(regMatch.group(2).split(" ").toList),JustValue(2))
+    def get_value(strings: List[String]): Value = {
 
 
-            case "the" :: "quotient" :: "between" :: tail =>
-                val regex = "(the quotient between )(.*) and (.*)".r
-                val regMatch = regex.findFirstMatchIn(line).get
-                 Quotient(
-                    choose_operation(regMatch.group(2).split(" ").toList),
-                    choose_operation(regMatch.group(3).split(" ").toList))
-            case "the" :: "square" :: "of" :: tail =>
-                val regex = "(the square of )(.*)".r
-                val regMatch = regex.findFirstMatchIn(line).get
-                 Square(
-                    choose_operation(regMatch.group(2).split(" ").toList))
-            case "the" :: "square" :: "root" :: "of" :: tail =>
-                val regex = "(the square root of )(.*)".r
-                val regMatch = regex.findFirstMatchIn(line).get
-                 SquareRoot(
-                    choose_operation(regMatch.group(2).split(" ").toList))
-            case "the" :: "remainder" :: "between" :: tail =>
-                val regex = "(the remainder between )(.*) and (.*)".r
-                val regMatch = regex.findFirstMatchIn(line).get
-                 Remainder(
-                    choose_operation(regMatch.group(2).split(" ").toList),
-                    choose_operation(regMatch.group(3).split(" ").toList))
-            case constant =>  normal_value(words)
-        }
-    }
-*/
+        if (dictionary.be.contains(strings(1))) {
+            strings match {
 
-    def get_value(strings: List[String]) : Value = {
-
-
-        if (dictionary.be.contains(strings(1)))
-            {
-                strings match {
-
-                    case _ :: _ :: tail =>
+                case _ :: _ :: tail =>
                     tail match {
 
-                        case "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
+                        case "as" :: _ :: "as" :: tail1 => choose_operation(tail1)
                         case tail1 => normal_value(tail1)
                     }
-                }
             }
+        }
         else {
 
             strings match {
                 case _ :: tail =>
-                tail match {
+                    tail match {
 
-                    case "as" :: _  ::"as" :: tail1 => choose_operation(tail1)
-                    case tail1 => normal_value(tail1)
+                        case "as" :: _ :: "as" :: tail1 => choose_operation(tail1)
+                        case tail1 => normal_value(tail1)
 
-                }
+                    }
             }
         }
     }

@@ -17,12 +17,6 @@ sealed abstract class Value extends Expression
 sealed abstract class Condition extends Expression
 
 
-
-case class TODOExpression(todo: String) extends Expression { //TODO EXPRESSIONS
-    override def toString = s"Some expressions"
-}
-
-
 case class PositiveNoun(speaker : Boolean) extends Value
 case class NegativeNoun(speaker : Boolean) extends Value
 case class NeutralNoun(speaker : Boolean) extends Value
@@ -50,11 +44,11 @@ case class LoadInt(speaker : Boolean) extends Expression
 case class PrintChar(speaker : Boolean) extends Expression
 case class LoadChar(speaker : Boolean) extends Expression
 
-case class GotoS(scene: Int) extends Expression //TODO LOW PRIO
-case class GotoA(act: Int) extends Expression //TODO LOW PRIO
+case class GotoS(scene: Int) extends Expression
+case class GotoA(act: Int) extends Expression
 
-case class Push(speaker: Boolean) extends Expression  //TODO LOW PRIO
-case class Pop() extends Expression  //TODO LOW PRIO
+case class Push(speaker: Boolean) extends Expression
+case class Pop() extends Expression
 
 case class Equal(a: Value, b: Value) extends Condition
 case class Less(a: Value, b: Value) extends Condition

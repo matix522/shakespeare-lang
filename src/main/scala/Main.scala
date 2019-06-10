@@ -12,8 +12,18 @@ object Main {
         val dictionary = new Dictionary;
 
         val sourceCode = loadFile(args(0))
+        if(args.length > 1) {
+            val parser = new Parser(sourceCode, dictionary)
+            val (characters, play) = parser.parse(args(1).toBoolean)
+            val interpreter = new Interpreter(characters,play)
+            interpreter.execute(args(1).toBoolean)
+        }else {
+            val parser = new Parser(sourceCode, dictionary)
+            val (characters, play) = parser.parse()
+            val interpreter = new Interpreter(characters,play)
+            interpreter.execute()
+        }
 
-        val parser = new Parser(sourceCode, dictionary)
-        parser.parse()
+        println("")
     }
 }

@@ -16,10 +16,8 @@ class Stage {
     }
 
     def exit(character: Character): Unit = {
-        //println(speaker)
-        //println(listener)
 
-        if (speaker.get.name == character.name){
+        if (speaker.get.name == character.name) {
 
             speaker = None
             return
@@ -27,25 +25,12 @@ class Stage {
 
         }
 
-        if (listener.get.name == character.name){
+        if (listener.get.name == character.name) {
 
             listener = None
             return
 
         }
-
-//        speaker match {
-//            case Some(`character`) =>
-//                speaker = None
-//
-//            case _ =>
-//        }
-//        listener match {
-//            case Some(`character`) =>
-//                listener = None
-//
-//            case _ => throw new RuntimeException(s"There is no $character on the scene.")
-//        }
 
     }
 
@@ -81,7 +66,8 @@ class Stage {
             case Some(`character`) => return
             case _ =>
         }
-        throw new RuntimeException(s"$character is not on scene.")
+        speaker = Some(character)
+        //throw new RuntimeException(s"$character is not on scene.")
     }
 
     def isOnStage(character: Character): Boolean = {
@@ -108,4 +94,6 @@ class Stage {
             case None => throw new RuntimeException("There is no listener.")
         }
     }
+
+    override def toString = s"Stage($getSpeaker, $getListener)"
 }
