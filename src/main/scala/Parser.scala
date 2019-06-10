@@ -3,7 +3,7 @@ import scala.collection.mutable.ListBuffer
 class Parser(val sourceCode: String, val dictionary: Dictionary) {
 
     def parse(debug: Boolean = false): (Map[String, Character], Map[Int, Act]) = {
-        val actsCode = sourceCode.split("Act ").toList
+        val actsCode = sourceCode.split("\\.").drop(1).mkString(".").split("Act ").toList
         if (actsCode.length < 2) {
             throw new IllegalArgumentException("No acts in source code")
         }
